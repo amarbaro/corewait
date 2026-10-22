@@ -1,0 +1,16 @@
+run: cycles 1178005963 ipc 0.70 | frontend 0.7% bad-spec 0.0% backend 78.6% retiring 20.7% (Skylake topdown-* events over 4 slots per cycle, two perf stat passes of 3 counters each; backend = what fetch bubbles, retiring and bad speculation leave)
+fn  82.2%  cwprobe::stream_k
+fn  17.8%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    13c2  29.8%    338000000    23400000         0         0  mem    vpaddq ymm1, ymm1, ymmword ptr [rdi + 8*rax + 0xe0]
+    13b9  14.1%    160000000    16420000   5000000         0  mem    vpaddq ymm2, ymm2, ymmword ptr [rdi + 8*rax + 0xc0]
+    139b  13.3%    151000000    15620000   6000000         0  mem    vpaddq ymm5, ymm5, ymmword ptr [rdi + 8*rax + 0x40]
+    13a7  12.1%    138000000    13580000   4000000         0  mem    vpaddq ymm4, ymm4, ymmword ptr [rdi + 8*rax + 0x80]
+    1542   7.0%     79000000           0         0         0  dep    inc rax
+    1395   4.3%     49000000     3420000   4000000         0  mem    vpaddq ymm0, ymm0, ymmword ptr [rdi + 8*rax + 0x20]
+    13a1   4.2%     48000000     4560000         0         0  mem    vpaddq ymm6, ymm6, ymmword ptr [rdi + 8*rax + 0x60]
+    1534   3.6%     41000000           0         0         0  dep    mov rcx, r8
+    1527   3.0%     34000000           0         0         0  busy   xor rdx, rcx
+    13b0   2.6%     30000000     3440000   4000000         0  mem    vpaddq ymm3, ymm3, ymmword ptr [rdi + 8*rax + 0xa0]
+    153e   2.3%     26000000           0         0         0  dep    mov qword ptr [rdi + 8*rax], rcx
+    153b   1.9%     22000000           0         0         0  dep    xor rcx, r8

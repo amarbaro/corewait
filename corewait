@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+# corewait record DEV OUT -- BINARY [ARGS...]   run BINARY under the device's profiler, write OUT/{samples,stat}.tsv + objdump.txt + meta.txt
+# corewait show OUT [BINARY] | diff OUT_A OUT_B [BIN_A BIN_B] | budget OUT FILE      the Mojo analyzer (build/corewait-an), src/corewait.mojo
+# corewait bw DEV                               sequential-read GB/s with 1, 2, 4 and all concurrent cwprobe stream processes
+# corewait merge OUT DIR...                     add repeated recordings of one binary into OUT
+# corewait build DEV                            build/cwprobe-DEV, the probe cross-compiled for the device
+# BINARY is a host ELF, unstripped; on a remote device it is pushed to the device work dir first.
+# samples.tsv: event TAB dso TAB vaddr TAB count   event in cycles|mem|fe|br, vaddr as objdump prints it, count in raw events
+# stat.tsv:    name TAB count                      cycles instructions slots fe be be_mem ret bad time_us (slots = issue slots, or cycles), note, p_ROLE
+set -euo pipefail
+here=$(cd "$(dirname "$0")" && pwd)
+fail() { echo "FAIL $1: $2" >&2; exit 1; }
+# mojo build opens the GPU even for CPU code: queue it behind gpu-wait when that is installed
+GW=""; command -v gpu-wait > /dev/null && GW="gpu-wait run --shared --vram 1 --timeout 600 --"
+# remote device targets (CW_LAPTOP_SSH, CW_XIAOMI_ADB, CW_XIAOMI_LOCK, CW_FLIP_ADB, CW_ONEPLUS_ADB) from the env or this file
+cfg=${CW_DEVICES:-$HOME/.config/corewait/devices.env}; [ -f "$cfg" ] && . "$cfg"
+
+# ---- device table: kind transport target workdir bw-MB lock-serial cpu masks to pin to (first that taskset accepts) ----------------------------
+dev_row() { case "$1" in
+    desktop) echo "perf local - $here/.work/dev 256 - -" ;;
+    laptop)  echo "perf ssh ${CW_LAPTOP_SSH:?set CW_LAPTOP_SSH=user@host} corewait 64 - -" ;;
+    xiaomi)  echo "simpleperf adb ${CW_XIAOMI_ADB:?set CW_XIAOMI_ADB=serial or ip:port} /data/local/tmp/corewait 64 ${CW_XIAOMI_LOCK:--} -" ;;
+    flip)    echo "simpleperf adb ${CW_FLIP_ADB:?set CW_FLIP_ADB=serial} /data/local/tmp/corewait 64 ${CW_FLIP_ADB} 80:40:20" ;;   # the X2, then A710s: the phone isolates cores at random and taskset answers EINVAL for them
+    oneplus) echo "simpleperf adb ${CW_ONEPLUS_ADB:?set CW_ONEPLUS_ADB=serial} /data/local/tmp/corewait 64 ${CW_ONEPLUS_ADB} -" ;;
+    *) fail device "unknown device '$1' (desktop laptop xiaomi flip oneplus)" ;;
+esac; }
+# role|event|period of the sampled run (CW_DIV divides the periods for short runs): cycles, memory events (one or two), one front-end event, branch misses. perf takes an event with a
+# period= term only if it is a plain name or raw cpu/event=..,umask=../ terms: the JSON-named Intel events override period= (400009).
+sample_events() { case "$1" in
+    desktop) echo "cycles|cycles|1000000 mem|ls_any_fills_from_sys.dram_io_all|10000 fe|ic_tag_hit_miss.instruction_cache_miss|1000 br|ex_ret_brn_misp|10000" ;;
+    laptop)  echo "cycles|cycles|1000000 mem|event=0xd1,umask=0x08|20000 fe|event=0x9c,umask=0x01|1000000 br|branch-misses|10000" ;;   # l1_miss, idq_uops_not_delivered.core
+    *)       echo "cycles|cpu-cycles|1000000 mem|raw-stall-backend-mem|1000000 mem|raw-bus-access-rd|1000000 fe|raw-stall-frontend|1000000 br|raw-br-mis-pred-retired|1000000" ;;
+esac; }
+# role=event of the whole-run stat pass; slots=, issued= and rec= (topdown) derive bad and be, else slots = cycles * slots-per-cycle
+stat_events() { case "$1" in
+    desktop) echo "6 cycles=ls_not_halted_cyc instructions=instructions be=de_no_dispatch_per_slot.backend_stalls fe=de_no_dispatch_per_slot.no_ops_from_frontend ret=ex_ret_ops time_ms=task-clock" ;;
+    laptop)  echo "4 cycles=cycles instructions=instructions ret=topdown-slots-retired issued=topdown-slots-issued rec=topdown-recovery-bubbles ; fe=topdown-fetch-bubbles time_ms=task-clock" ;;
+    *)       echo "1 cycles=cpu-cycles instructions=instructions be=raw-stall-backend fe=raw-stall-frontend be_mem=raw-stall-backend-mem" ;;   # time from simpleperf's "Total test time" line: task-clock:u is refused on some phones
+esac; }
+stat_note() { case "$1" in
+    desktop) echo "Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events" ;;
+    laptop)  echo "Skylake topdown-* events over 4 slots per cycle, two perf stat passes of 3 counters each; backend = what fetch bubbles, retiring and bad speculation leave" ;;
+    *)       echo "ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest" ;;
+esac; }
+
+# build/cwprobe-DEV: the probe cross-compiled for the device and linked with probes/kgen_shim.c, so it needs no Mojo runtime
+build() {
+    local dev=$1 o=$here/build/cwprobe-$1 mf cc=clang libs="-lm -lpthread"
+    case "$dev" in
+        desktop) mf="--target-cpu znver4" ;;
+        laptop)  mf="--target-cpu skylake" ;;
+        xiaomi)  mf="--target-triple aarch64-unknown-linux-gnu --target-cpu cortex-a76 --target-features +dotprod,+i8mm" ;;
+        flip)    mf="--target-triple aarch64-unknown-linux-gnu --target-cpu cortex-x2 --target-features +dotprod,+i8mm" ;;
+        oneplus) mf="--target-triple aarch64-unknown-linux-gnu --target-cpu cortex-a76 --target-features +dotprod" ;;
+        *) fail device "unknown device '$dev'" ;;
+    esac
+    [ "${mf#*aarch64}" = "$mf" ] || { cc=/opt/android-sdk/ndk/29.0.13113456/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android31-clang; libs="-pie -lm"; }
+    mkdir -p "$here/build"
+    # shellcheck disable=SC2086
+    $GW mojo build "$here/probes/cwprobe.mojo" $mf --emit object -o "$o.o" > "$o.log" 2>&1 \
+        || fail build "mojo build $dev: $(grep -m3 error "$o.log") (log $o.log)"
+    # shellcheck disable=SC2086
+    $cc -O2 -o "$o" "$o.o" "$here/probes/kgen_shim.c" $libs > "$o.link.log" 2>&1 || fail build "link $dev: $(head -3 "$o.link.log")"
+}
+
+# run a shell command on the device, in its work dir DWD; copy files to it and back
+dsh() { local how=$1 target=$2; shift 2; case "$how" in
+    local) bash -c "$*" ;;
+    ssh)   ssh -o BatchMode=yes "$target" "cd ${DWD:-.} && $*" ;;
+    adb)   adb -s "$target" shell "cd ${DWD:-/} && $*" ;;
+esac; }
+put() { local how=$1 target=$2 wd=$3 f=$4; case "$how" in
+    ssh) scp -q "$f" "$target:$wd/" ;;
+    adb) adb -s "$target" push "$f" "$wd/" > /dev/null ;;
+esac; }
+get() { local how=$1 target=$2 wd=$3 out=$4 f; shift 4; for f in "$@"; do case "$how" in
+    ssh) scp -q "$target:$wd/$f" "$out/" ;;
+    adb) adb -s "$target" pull "$wd/$f" "$out/" > /dev/null ;;
+esac; done; }
+# one runner per phone: other tools sharing the phone take the same lock (CW_LOCK_DIR), held until this process exits
+lock() { local how=$1 serial=$2
+    [ "$how" = adb ] || return 0
+    local dir=${CW_LOCK_DIR:-$HOME/.cache/corewait}; mkdir -p "$dir"
+    exec 9> "$dir/phone-$serial.lock"; flock -w 1800 9 || fail lock "phone $serial busy ($dir)"; }
+
+# "taskset MASK" for the first cpu mask of PIN (a:b:c) the device accepts, "" for none: the phones isolate cores at random
+# and answer EINVAL for them
+pin_prefix() { local how=$1 target=$2 pin=$3 m
+    [ "$pin" = - ] && return 0
+    for m in ${pin//:/ }; do dsh "$how" "$target" "taskset $m true" > /dev/null 2>&1 && { echo "taskset $m"; return 0; }; done
+    fail pin "no cpu mask of $pin accepted by taskset on $target"; }
+
+record() {
+    local dev=$1 out=$2; shift 2; [ "${1:-}" = -- ] && shift
+    local bin=${1:?usage: corewait record DEV OUT -- BINARY [ARGS...]}; shift
+    [ -x "$bin" ] || fail record "$bin is not an executable file"
+    local kind how target wd mb serial pin; dev_row "$dev" >/dev/null; read -r kind how target wd mb serial pin <<<"$(dev_row "$dev")"
+    lock "$how" "$serial"
+    mkdir -p "$out"; out=$(readlink -f "$out")
+    local name cmd rwd=$wd; name=$(basename "$bin")
+    if [ "$how" = local ]; then
+        cmd="$(readlink -f "$bin") $*"; rwd=$out
+    else
+        dsh "$how" "$target" "mkdir -p $wd"; put "$how" "$target" "$wd" "$bin"; DWD=$wd; rwd=.; cmd="./$name $*"
+    fi
+    cmd="$(pin_prefix "$how" "$target" "$pin") $cmd"; cmd=${cmd# }
+    "record_$kind" "$dev" "$out" "$how" "$target" "$cmd" "$name" "$rwd" "$bin"
+    objdump_of "$bin" "$out"
+    { echo "device	$dev"; echo "binary	$name"; echo "sha256	$(sha256sum "$bin" | cut -d' ' -f1)"
+      echo "command	$cmd"; echo "hostbin	$(readlink -f "$bin")"; echo "date	$(date -Is)"; } > "$out/meta.txt"
+}
+
+# ELF vaddr minus file offset of the executable segment: perf gives file offsets, objdump prints vaddrs
+vaddr_delta() { llvm-readelf -lW "$1" | gawk '/^ *LOAD/ && / E / { print strtonum($3) - strtonum($2); exit }'; }
+
+# OUT/objdump.txt: llvm-objdump of BIN, kept to the functions that hold samples (intel syntax: destination first, as on ARM)
+objdump_of() {
+    llvm-objdump -d --no-show-raw-insn --x86-asm-syntax=intel "$1" | gawk -v samples="$2/samples.tsv" '
+        BEGIN { while ((getline l < samples) > 0) { split(l, f, "\t"); hit[f[3]] = 1 } }
+        function flush() { if (keep) printf "%s", blk; blk = ""; keep = 0 }
+        /^[0-9a-f]+ </ { flush() }
+        { blk = blk $0 "\n" }
+        /^ +[0-9a-f]+:/ { a = $1; sub(/:$/, "", a); if (a in hit) keep = 1 }
+        END { flush() }' > "$2/objdump.txt"
+    [ -s "$2/objdump.txt" ] || fail objdump "no sampled address of $2/samples.tsv found in $1"
+}
+
+# OUT/stat.tsv from the stat pass's csv ($1 = column holding the event name)
+stat_tsv() {
+    local dev=$1 out=$2 col=$3 w tbl; read -r w tbl <<<"$(stat_events "$dev")"
+    gawk -F, -v tbl="$tbl" -v w="$w" -v col="$col" 'BEGIN { n = split(tbl, a, " "); for (i = 1; i <= n; i++) { split(a[i], kv, "="); role[kv[2] ":u"] = kv[1] } }
+        $col in role { v[role[$col]] = $1 }
+        /^Total test time/ { v["time_ms"] = $2 * 1000 }
+        END { v["time_us"] = int(v["time_ms"] * 1000); delete v["time_ms"]
+              if (!("slots" in v)) v["slots"] = v["cycles"] * w
+              if ("issued" in v) { v["bad"] = v["issued"] - v["ret"] + v["rec"]; v["be"] = v["slots"] - v["fe"] - v["ret"] - v["bad"]; delete v["issued"]; delete v["rec"] }
+              else if (!("ret" in v)) v["ret"] = v["slots"] - v["fe"] - v["be"]
+              for (r in v) print r "\t" v[r] }' "$out/stat.raw" | sort > "$out/stat.tsv"
+    { printf "note\t%s\n" "$(stat_note "$dev")"; for spec in $(sample_events "$dev"); do IFS="|" read -r role _ p <<<"$spec"; p=$((p / ${CW_DIV:-1})); printf "p_%s\t%s\n" "$role" "$p"; done; } >> "$out/stat.tsv"
+}
+
+record_perf() {
+    local dev=$1 out=$2 how=$3 target=$4 cmd=$5 name=$6 rwd=$7 bin=$8 spec ev="" st="" role e p w tbl
+    for spec in $(sample_events "$dev"); do
+        IFS="|" read -r role e p <<<"$spec"; p=$((p / ${CW_DIV:-1}))
+        if [ "${e#*=}" = "$e" ]; then ev="$ev -e '$e/period=$p,name=$role/u'"; else ev="$ev -e 'cpu/$e,period=$p,name=$role/u'"; fi
+    done
+    dsh "$how" "$target" "perf record -q -o $rwd/perf.data $ev -- $cmd" > "$out/run.txt" 2>&1 \
+        || fail record "perf record: $(tail -3 "$out/run.txt")"
+    read -r w tbl <<<"$(stat_events "$dev")"
+    dsh "$how" "$target" "rm -f $rwd/stat.raw"   # one perf stat pass per ";" group: more events than counters would multiplex and skew the shares
+    for spec in $tbl ";"; do
+        if [ "$spec" = ";" ]; then dsh "$how" "$target" "perf stat -x, --append -o $rwd/stat.raw $st -- $cmd" > /dev/null 2>&1 || fail record "perf stat"; st=""
+        else st="$st -e ${spec#*=}:u"; fi
+    done
+    [ "$how" = local ] || get "$how" "$target" "$DWD" "$out" perf.data stat.raw
+    perf script -i "$out/perf.data" --show-mmap-events -F event,period,ip,dso 2> /dev/null | gawk -v name="$name" \
+        -v delta="$(vaddr_delta "$bin")" '
+        /PERF_RECORD_MMAP2.*r-xp/ { match($0, /\[0x[0-9a-f]+\(0x[0-9a-f]+\) @ 0x[0-9a-f]+/); split(substr($0, RSTART + 1, RLENGTH - 1), f, /[(\) @]+/)
+                                   path = $NF; m++; start[m] = strtonum(f[1]); len[m] = strtonum(substr(f[2], 1)); pgoff[m] = strtonum(f[3]); mp[m] = path; next }
+        / [0-9a-f]+ \(/ { ev = $2; sub(/:$/, "", ev); ip = strtonum("0x" $3); path = $4; gsub(/[()]/, "", path)
+                          for (i = m; i >= 1; i--) if (mp[i] == path && path ~ "/" name "$" && ip >= start[i] && ip < start[i] + len[i]) {
+                              c[ev "\t" name "\t" sprintf("%x", ip - start[i] + pgoff[i] + delta)] += $1; break } }
+        END { for (k in c) print k "\t" c[k] }' | sort -k1,1 -k3,3 > "$out/samples.tsv"
+    [ -s "$out/samples.tsv" ] || fail record "no samples for $name in $out/perf.data (see $out/run.txt)"
+    stat_tsv "$dev" "$out" 3
+}
+
+record_simpleperf() {
+    local dev=$1 out=$2 how=$3 target=$4 cmd=$5 name=$6 rwd=$7 bin=$8 spec ev="" st="" map="" role e p w tbl per
+    for spec in $(sample_events "$dev"); do
+        IFS="|" read -r role e p <<<"$spec"; p=$((p / ${CW_DIV:-1})); ev="$ev -e $e:u"; map="$map $e=$role"; per=$p
+    done
+    dsh "$how" "$target" "simpleperf record -o $rwd/perf.data $ev -c $per -- $cmd" > "$out/run.txt" 2>&1 \
+        || fail record "simpleperf record: $(tail -3 "$out/run.txt")"
+    # the report is text with one "Event: NAME:u" section per event; EventCount = samples * period
+    dsh "$how" "$target" "simpleperf report -i $rwd/perf.data --sort dso,vaddr_in_file --print-event-count" 2> /dev/null | tr -d '\r' \
+        | gawk -v map="$map" -v name="$name" '
+        BEGIN { n = split(map, a, " "); for (i = 1; i <= n; i++) { split(a[i], kv, "="); role[kv[1]] = kv[2] } }
+        /^Event: / { e = $2; sub(/:u$/, "", e); r = role[e]; next }
+        r != "" && $3 ~ "/" name "$" && $4 ~ /^0x/ { c[r "\t" name "\t" substr($4, 3)] += $2 }
+        END { for (k in c) print k "\t" c[k] }' | sort -k1,1 -k3,3 > "$out/samples.tsv"
+    [ -s "$out/samples.tsv" ] || fail record "no samples for $name (see $out/run.txt)"
+    read -r w tbl <<<"$(stat_events "$dev")"
+    for spec in $tbl; do st="$st,${spec#*=}:u"; done
+    dsh "$how" "$target" "simpleperf stat --csv -e ${st#,} -- $cmd" 2> /dev/null | tr -d '\r' > "$out/stat.raw" || fail record "simpleperf stat"
+    stat_tsv "$dev" "$out" 2
+}
+
+bw() {
+    local dev=$1 kind how target wd mb serial pin out="" t n run=$here/build/cwprobe-$1 go=go
+    dev_row "$dev" >/dev/null; read -r kind how target wd mb serial pin <<<"$(dev_row "$dev")"
+    [ -x "$run" ] || fail bw "$run missing: corewait build $dev"
+    lock "$how" "$serial"
+    if [ "$how" = local ]; then mkdir -p "$wd"; go=$wd/go
+    else dsh "$how" "$target" "mkdir -p $wd"; put "$how" "$target" "$wd" "$run"; DWD=$wd; run=./cwprobe-$dev; fi
+    n=$(dsh "$how" "$target" nproc | tr -d '\r')
+    for t in 1 2 4 "$n"; do
+        local pre=""; [ "$t" = 1 ] && pre=$(pin_prefix "$how" "$target" "$pin")   # one thread: the core record pins to, so the two agree
+        dsh "$how" "$target" "rm -f $go"
+        out="$out ${t}t=$({ for _ in $(seq "$t"); do dsh "$how" "$target" "$pre $run stream --n $mb --go $go" & done
+                           sleep 3; dsh "$how" "$target" "touch $go"; wait; } | tr -d '\r' | gawk '{ s += $NF } END { printf "%.1f", s }')"
+    done
+    echo "bw $dev GB/s$out"
+}
+
+# corewait merge OUT DIR...: add the samples and counts of repeated recordings of one binary (a 40 ms kernel needs many)
+merge() {
+    local out=$1; shift; mkdir -p "$out"
+    cat "${@/%//samples.tsv}" | gawk -F'\t' -v OFS='\t' '{ c[$1 OFS $2 OFS $3] += $4 } END { for (k in c) print k, c[k] }' | sort -k1,1 -k3,3 > "$out/samples.tsv"
+    cat "${@/%//stat.tsv}" | gawk -F'\t' -v OFS='\t' '$1 ~ /^(note|p_)/ { if (!($1 in c)) c[$1] = $2; next } { c[$1] += $2 } END { for (k in c) print k, c[k] }' | sort > "$out/stat.tsv"
+    { cat "$1/meta.txt"; echo "merged	$#"; } > "$out/meta.txt"; objdump_of "$(gawk -F"\t" '$1 == "hostbin" { print $2 }' "$1/meta.txt")" "$out"
+}
+
+# corewait attached DEV: exit 0 when the device answers (the wifi phones drop off; CW_XIAOMI_ADB=ip:port reconnects one)
+attached() {
+    local kind how target; dev_row "$1" >/dev/null; read -r kind how target _ <<<"$(dev_row "$1")"
+    case "$how" in
+        adb) adb devices | gawk -v t="$target" '$1 == t && $2 == "device" { f = 1 } END { exit !f }' ;;
+        ssh) ssh -o BatchMode=yes -o ConnectTimeout=5 "$target" true ;;
+    esac
+}
+
+# objdump.txt is written by record; a BINARY argument regenerates a missing one
+prep() { [ -s "$1/objdump.txt" ] || { [ -f "${2:-}" ] && objdump_of "$2" "$1"; } || true; }
+cmd=${1:-}; shift || true
+case "$cmd" in
+    record) record "$@" ;;
+    bw)     bw "$@" ;;
+    attached) attached "$@" ;;
+    merge)  merge "$@" ;;
+    build)  build "$@" ;;
+    show)   prep "$1" "${2:-}"; exec "$here/build/corewait-an" show "$@" ;;
+    diff)   prep "$1" "${3:-}"; prep "${2:-}" "${4:-}"; exec "$here/build/corewait-an" diff "$@" ;;
+    budget) exec "$here/build/corewait-an" budget "$@" ;;
+    *) fail usage "corewait record|show|diff|budget|bw|build ..." ;;
+esac

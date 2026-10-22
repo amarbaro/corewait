@@ -1,0 +1,14 @@
+run: cycles 2502309118 ipc 0.64 | frontend 74.7% backend 2.5% retiring 12.8% (Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events)
+fn   7.6%  cwprobe::up
+fn   6.9%  cwprobe::down
+fn  85.5%  cwprobe::branchy_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    147a  41.2%    997000000           0     11000  28910000  branch call 0x1420 <cwprobe::up(::SIMD[DType.uint64, 1])>
+    1463  39.8%    964000000           0     10000  26400000  branch call 0x1430 <cwprobe::down(::SIMD[DType.uint64, 1])>
+    1420   6.3%    152000000           0      2000   4240000  branch lea rax, [rdi + 2*rdi + 0x1]
+    1430   5.3%    129000000           0      1000   4360000  branch mov rax, rdi
+    1475   4.2%    102000000           0      3000   3050000  branch je 0x1460 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOr
+    1437   1.5%     37000000           0         0    660000  branch xor rax, rdi
+    1425   1.3%     32000000           0      1000    800000  branch ret
+    146b   0.2%      6000000           0         0     90000  dep    cmp r14, r15
+    1482   0.1%      3000000           0      1000     70000  dep    cmp r14, r15

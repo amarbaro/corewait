@@ -1,0 +1,38 @@
+00000000000081e0 <cwprobe::up(::SIMD[DType.uint64, 1])>:
+    81e0:      	add	x8, x0, x0, lsl #1
+    81e4:      	add	x0, x8, #0x1
+    81e8:      	ret
+    81ec:      	nop
+
+00000000000081f0 <cwprobe::down(::SIMD[DType.uint64, 1])>:
+    81f0:      	eor	x0, x0, x0, lsr #3
+    81f4:      	ret
+    81f8:      	nop
+    81fc:      	nop
+
+0000000000008200 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])>:
+    8200:      	cmp	x1, #0x1
+    8204:      	b.lt	0x8258 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x58>
+    8208:      	str	x30, [sp, #-0x20]!
+    820c:      	stp	x20, x19, [sp, #0x10]
+    8210:      	bic	x20, x1, x1, asr #63
+    8214:      	mov	x19, x0
+    8218:      	b	0x8234 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x34>
+    821c:      	nop
+    8220:      	mov	x0, x2
+    8224:      	bl	0x81f0 <cwprobe::down(::SIMD[DType.uint64, 1])>
+    8228:      	subs	x20, x20, #0x1
+    822c:      	mov	x2, x0
+    8230:      	b.eq	0x8250 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x50>
+    8234:      	ldrb	w8, [x19], #0x8
+    8238:      	tbz	w8, #0x0, 0x8220 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x20>
+    823c:      	mov	x0, x2
+    8240:      	bl	0x81e0 <cwprobe::up(::SIMD[DType.uint64, 1])>
+    8244:      	subs	x20, x20, #0x1
+    8248:      	mov	x2, x0
+    824c:      	b.ne	0x8234 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x34>
+    8250:      	ldp	x20, x19, [sp, #0x10]
+    8254:      	ldr	x30, [sp], #0x20
+    8258:      	mov	x0, x2
+    825c:      	ret
+

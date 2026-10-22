@@ -1,0 +1,7 @@
+run: cycles 2835696145 ipc 0.50 | frontend 1.2% backend 90.5% retiring 7.3% (Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events)
+sol: 26843545600 bytes in 605 ms = 44.4 GB/s, 90.0% of the device's 49.3 GB/s
+fn 100.0%  cwprobe::stream_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    1397  52.0%   1194000000    72770000    140000         0  mem    vpaddq zmm0, zmm0, zmmword ptr [rdi + 8*rax + 0xc0]
+    138f  28.0%    643000000    40130000    148000     10000  mem    vpaddq zmm1, zmm1, zmmword ptr [rdi + 8*rax + 0x80]
+    1387  19.9%    458000000    24290000    125000         0  mem    vpaddq zmm2, zmm2, zmmword ptr [rdi + 8*rax + 0x40]

@@ -1,0 +1,5 @@
+device	flip
+binary	cwprobe-flip
+sha256	9f6e8a2a274fe2197408848cec6202355be015093fc916fc8f80fcf4801894a7
+command	taskset 20 ./cwprobe-flip branchy
+date	2026-10-21T23:20:16+02:00

@@ -1,0 +1,16 @@
+run: cycles 2835696145 ipc 0.50 | frontend 1.2% backend 90.5% retiring 7.3% (Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events)
+fn  91.9%  cwprobe::stream_k
+fn   8.1%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    1397  47.8%   1194000000    72770000    140000         0  mem    vpaddq zmm0, zmm0, zmmword ptr [rdi + 8*rax + 0xc0]
+    138f  25.7%    643000000    40130000    148000     10000  mem    vpaddq zmm1, zmm1, zmmword ptr [rdi + 8*rax + 0x80]
+    1387  18.3%    458000000    24290000    125000         0  mem    vpaddq zmm2, zmm2, zmmword ptr [rdi + 8*rax + 0x40]
+    1507   2.4%     60000000           0         0         0  dep    shl rcx, 0x11
+    14f7   1.9%     47000000       10000      3000         0  busy   xor rdx, rcx
+    1501   1.6%     40000000           0         0         0  dep    xor r8, rdx
+    14fd   1.1%     27000000           0      1000         0  dep    shr r8, 0x7
+    14fa   0.5%     13000000           0         0         0  dep    mov r8, rdx
+    150b   0.4%      9000000       10000         0         0  dep    xor rcx, r8
+    1504   0.1%      3000000           0      1000         0  dep    mov rcx, r8
+    150e   0.1%      3000000           0         0         0  dep    mov qword ptr [rdi + 8*rax], rcx
+    13a8   0.0%      1000000       40000         0         0  busy   cmp rax, rsi

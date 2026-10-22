@@ -1,0 +1,18 @@
+run: cycles 1391110894 ipc 0.55 | frontend 45.8% bad-spec 24.3% backend 14.8% retiring 15.2% (Skylake topdown-* events over 4 slots per cycle, two perf stat passes of 3 counters each; backend = what fetch bubbles, retiring and bad speculation leave)
+fn  15.1%  cwprobe::up
+fn  14.8%  cwprobe::down
+fn  70.0%  cwprobe::branchy_k
+fn   0.1%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    14aa  17.3%    232000000       40000  49000000   9830000  branch call 0x1450 <cwprobe::up(::SIMD[DType.uint64, 1])>
+    14a7  16.2%    218000000      180000 477000000     10000  branch mov rdi, rax
+    1450  14.4%    193000000     1360000 323000000   7980000  mem    lea rax, [rdi + 2*rdi]
+    1493  13.7%    184000000       20000  31000000   9260000  branch call 0x1460 <cwprobe::down(::SIMD[DType.uint64, 1])>
+    1460  13.6%    183000000     1140000 395000000   2240000  mem    mov rax, rdi
+    1490  13.2%    178000000      120000 465000000         0  branch mov rdi, rax
+    14a5   7.6%    102000000       20000 127000000     30000  branch je 0x1490 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOr
+    14a0   1.9%     26000000           0  59000000     40000  branch test byte ptr [rbx + 8*r15], 0x1
+    146a   1.2%     16000000      120000  27000000   5350000  branch ret
+    1454   0.7%      9000000           0  14000000         0  branch inc rax
+    1457   0.1%      1000000           0  15000000         0  branch ret
+    149b   0.1%      1000000           0         0         0  dep    cmp r14, r15

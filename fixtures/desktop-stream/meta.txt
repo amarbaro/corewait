@@ -1,0 +1,6 @@
+device	desktop
+binary	cwprobe-desktop
+sha256	05b0c8301358097af6cfef9fc452328ffc3a4456315025e1053d4e14426e187a
+command	build/cwprobe-desktop stream
+hostbin	build/cwprobe-desktop
+date	2026-10-21T23:27:47+02:00

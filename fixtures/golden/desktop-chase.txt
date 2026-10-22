@@ -1,0 +1,9 @@
+run: cycles 2908722923 ipc 0.08 | frontend 0.6% backend 97.0% retiring 1.6% (Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events)
+fn  97.7%  cwprobe::chase_k
+fn   2.3%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    1340  97.0%   2283000000     4570000         0         0  mem    mov rax, qword ptr [rdi + 8*rax]
+    14c6   0.9%     22000000       70000      1000         0  busy   add rcx, r8
+    14d0   0.9%     21000000       70000      3000         0  dep    cmp rsi, rdx
+    1347   0.7%     17000000       10000         0         0  busy   jne 0x1340 <cwprobe::chase_k(::Pointer[True, MutUntrackedOri
+    14cd   0.4%     10000000       40000      2000         0  dep    inc rdx

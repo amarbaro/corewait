@@ -1,0 +1,4 @@
+# fn cause max-percent
+chase_k mem 100
+chase_k busy 5
+fill_k dep 100

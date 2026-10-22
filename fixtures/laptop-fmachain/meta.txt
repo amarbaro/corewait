@@ -1,0 +1,6 @@
+device	laptop
+binary	cwprobe-laptop
+sha256	375257d532704857b70e20fca6871f175820a614cb37e8987c527f8601eeef94
+command	./cwprobe-laptop fmachain
+hostbin	build/cwprobe-laptop
+date	2026-10-21T23:27:24+02:00

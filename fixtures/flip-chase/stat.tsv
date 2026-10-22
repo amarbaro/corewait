@@ -1,0 +1,14 @@
+be	1921380968
+be_mem	1568818582
+cycles	1977417126
+fe	3122832
+instructions	209995601
+ret	52913326
+slots	1977417126
+time_us	823242
+note	ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest
+p_cycles	1000000
+p_mem	1000000
+p_mem	1000000
+p_fe	1000000
+p_br	1000000

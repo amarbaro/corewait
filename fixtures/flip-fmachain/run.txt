@@ -1,0 +1,3 @@
+fmachain mb 1 steps 352321536 s 0.519064219 check 0 Msteps/s 678.7629027459509
+simpleperf I cmd_record.cpp:840] Recorded for 0.534884 seconds. Start post processing.
+simpleperf I cmd_record.cpp:941] Samples recorded: 1,421. Samples lost: 0.

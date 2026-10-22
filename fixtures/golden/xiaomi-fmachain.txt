@@ -1,0 +1,8 @@
+run: cycles 1280549336 ipc 0.75 | frontend 81.2% backend 3.7% backend-mem 0.0% retiring 15.1% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+fn  99.9%  cwprobe::fmachain_k
+fn   0.1%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    81c0  53.5%    645000000           0 614000000         0  dep    fmadd d0, d0, d1, d2
+    81c8  36.3%    438000000           0 289000000         0  dep    b.ne 0x81c0 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::
+    81c4  10.1%    122000000           0  78000000         0  dep    subs x0, x0, #0x1
+    82b0   0.1%      1000000           0         0         0  dep    eor x8, x8, x8, lsl #17

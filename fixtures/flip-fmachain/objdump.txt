@@ -1,0 +1,115 @@
+00000000000081b0 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::SIMD[DType.int, 1])>:
+    81b0:      	cmp	x0, #0x1
+    81b4:      	b.lt	0x81d4 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::SIMD[DType.int, 1])+0x24>
+    81b8:      	adrp	x8, 0x0 <write>
+    81bc:      	ldr	d1, [x8, #0x978]
+    81c0:      	adrp	x8, 0x0 <write>
+    81c4:      	ldr	d2, [x8, #0x970]
+    81c8:      	fmadd	d0, d0, d1, d2
+    81cc:      	subs	x0, x0, #0x1
+    81d0:      	b.ne	0x81c8 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::SIMD[DType.int, 1])+0x18>
+    81d4:      	ret
+    81d8:      	nop
+    81dc:      	nop
+
+0000000000008260 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)>:
+    8260:      	subs	x8, x1, #0x1
+    8264:      	b.lt	0x82d8 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x78>
+    8268:      	tbz	w2, #0x0, 0x82a4 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x44>
+    826c:      	mov	x9, #0x814f             // =33103
+    8270:      	mov	x10, #0x7f2d            // =32557
+    8274:      	movk	x9, #0xf767, lsl #16
+    8278:      	movk	x10, #0x4c95, lsl #16
+    827c:      	movk	x9, #0x7b7e, lsl #32
+    8280:      	movk	x10, #0xf42d, lsl #32
+    8284:      	movk	x9, #0x1405, lsl #48
+    8288:      	movk	x10, #0x5851, lsl #48
+    828c:      	and	x11, x9, x8
+    8290:      	add	x9, x9, x10
+    8294:      	subs	x1, x1, #0x1
+    8298:      	str	x11, [x0], #0x8
+    829c:      	b.ne	0x828c <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x2c>
+    82a0:      	b	0x82d8 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x78>
+    82a4:      	mov	x8, #0x7a44             // =31300
+    82a8:      	movk	x8, #0xcbbf, lsl #16
+    82ac:      	movk	x8, #0x408d, lsl #32
+    82b0:      	movk	x8, #0x139, lsl #48
+    82b4:      	nop
+    82b8:      	nop
+    82bc:      	nop
+    82c0:      	eor	x8, x8, x8, lsl #13
+    82c4:      	subs	x1, x1, #0x1
+    82c8:      	eor	x8, x8, x8, lsr #7
+    82cc:      	eor	x8, x8, x8, lsl #17
+    82d0:      	str	x8, [x0], #0x8
+    82d4:      	b.ne	0x82c0 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x60>
+    82d8:      	ret
+    82dc:      	nop
+
+000000000000c5c0 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=ui8,length=1,writer.T`2x=[typevalue<#kgen.instref<std::format::_utils::_FlushingWriteBuffer,origin._mlir_origin`={  },origin={  },W=[typevalue<#kgen.instref<std::io::file_descriptor::FileDescriptor>>, scalar<index>],capacity_bytes=4096>>, struct<(struct<(array<4096, scalar<ui8>>) memoryOnly>, scalar<index>, pointer<none>) memoryOnly>]>:
+    c5c0:      	sub	sp, sp, #0x70
+    c5c4:      	str	x30, [sp, #0x50]
+    c5c8:      	stp	x20, x19, [sp, #0x60]
+    c5cc:      	ldr	x2, [x1, #0x1000]
+    c5d0:      	mov	x19, x1
+    c5d4:      	tst	w0, #0xff
+    c5d8:      	b.eq	0xc678 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=ui8,length=1,writer.T`2x=[typevalue<#kgen.instref<std::format::_utils::_FlushingWriteBuffer,origin._mlir_origin`={  },origin={  },W=[typevalue<#kgen.instref<std::io::file_descriptor::FileDescriptor>>, scalar<index>],capacity_bytes=4096>>, struct<(struct<(array<4096, scalar<ui8>>) memoryOnly>, scalar<index>, pointer<none>) memoryOnly>]+0xb8>
+    c5dc:      	cmp	x2, #0x1, lsl #12       // =0x1000
+    c5e0:      	b.le	0xc604 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=ui8,length=1,writer.T`2x=[typevalue<#kgen.instref<std::format::_utils::_FlushingWriteBuffer,origin._mlir_origin`={  },origin={  },W=[typevalue<#kgen.instref<std::io::file_descriptor::FileDescriptor>>, scalar<index>],capacity_bytes=4096>>, struct<(struct<(array<4096, scalar<ui8>>) memoryOnly>, scalar<index>, pointer<none>) memoryOnly>]+0x44>
+    c5e4:      	ldr	x8, [x19, #0x1008]
+    c5e8:      	mov	w20, w0
+    c5ec:      	mov	x1, x19
+    c5f0:      	ldr	x8, [x8]
+    c5f4:      	mov	x0, x8
+    c5f8:      	bl	0xd670 <write@plt>
+    c5fc:      	mov	w0, w20
+    c600:      	str	xzr, [x19, #0x1000]
+    c604:      	mov	w9, #0xcd               // =205
+    c608:      	mov	w10, #0xa               // =10
+    c60c:      	add	x11, sp, #0xf
+    c610:      	adrp	x12, 0x3000 <global_constant+0x22b0>
+    c614:      	add	x12, x12, #0x400
+    c618:      	mov	x8, xzr
+    c61c:      	strb	wzr, [sp, #0x4f]
+    c620:      	and	w14, w0, #0xff
+    c624:      	mov	w13, w0
+    c628:      	mul	w15, w14, w9
+    c62c:      	lsr	w0, w15, #11
+    c630:      	add	x15, x11, x8
+    c634:      	sub	x8, x8, #0x1
+    c638:      	msub	w13, w0, w10, w13
+    c63c:      	and	x13, x13, #0xff
+    c640:      	ldrb	w13, [x12, x13]
+    c644:      	strb	w13, [x15, #0x3f]
+    c648:      	cmp	w14, #0x9
+    c64c:      	b.hi	0xc620 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=ui8,length=1,writer.T`2x=[typevalue<#kgen.instref<std::format::_utils::_FlushingWriteBuffer,origin._mlir_origin`={  },origin={  },W=[typevalue<#kgen.instref<std::io::file_descriptor::FileDescriptor>>, scalar<index>],capacity_bytes=4096>>, struct<(struct<(array<4096, scalar<ui8>>) memoryOnly>, scalar<index>, pointer<none>) memoryOnly>]+0x60>
+    c650:      	add	x9, sp, #0xf
+    c654:      	neg	x2, x8
+    c658:      	mov	x0, x19
+    c65c:      	add	x9, x9, x8
+    c660:      	add	x1, x9, #0x40
+    c664:      	bl	0xacd0 <std::format::_utils::_FlushingWriteBuffer::write_string[::Bool,LITOrigin[$4._mlir_value],::Origin[$4, $5]](::_FlushingWriteBuffer[$0, $1, $2, $3],::StringSpan[$4, $5, $6]),W=[typevalue<#kgen.instref<std::io::file_descriptor::FileDescriptor>>, scalar<index>],capacity_bytes=4096,string.mut`2x1=true>
+    c668:      	ldp	x20, x19, [sp, #0x60]
+    c66c:      	ldr	x30, [sp, #0x50]
+    c670:      	add	sp, sp, #0x70
+    c674:      	ret
+    c678:      	cmp	x2, #0x1, lsl #12       // =0x1000
+    c67c:      	mov	w8, #0x1001             // =4097
+    c680:      	ccmp	x2, x8, #0x0, ne
+    c684:      	b.lt	0xc6a0 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=ui8,length=1,writer.T`2x=[typevalue<#kgen.instref<std::format::_utils::_FlushingWriteBuffer,origin._mlir_origin`={  },origin={  },W=[typevalue<#kgen.instref<std::io::file_descriptor::FileDescriptor>>, scalar<index>],capacity_bytes=4096>>, struct<(struct<(array<4096, scalar<ui8>>) memoryOnly>, scalar<index>, pointer<none>) memoryOnly>]+0xe0>
+    c688:      	ldr	x8, [x19, #0x1008]
+    c68c:      	mov	x1, x19
+    c690:      	ldr	x0, [x8]
+    c694:      	bl	0xd670 <write@plt>
+    c698:      	mov	x2, xzr
+    c69c:      	str	xzr, [x19, #0x1000]
+    c6a0:      	mov	w8, #0x30               // =48
+    c6a4:      	strb	w8, [x19, x2]
+    c6a8:      	ldr	x8, [x19, #0x1000]
+    c6ac:      	add	x8, x8, #0x1
+    c6b0:      	str	x8, [x19, #0x1000]
+    c6b4:      	ldp	x20, x19, [sp, #0x60]
+    c6b8:      	ldr	x30, [sp, #0x50]
+    c6bc:      	add	sp, sp, #0x70
+    c6c0:      	ret
+

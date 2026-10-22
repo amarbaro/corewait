@@ -1,0 +1,49 @@
+0000000000001420 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::SIMD[DType.int, 1])>:
+    1420:      	test	rdi, rdi
+    1423:      	jle	0x144a <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::SIMD[DType.int, 1])+0x2a>
+    1425:      	vmovsd	xmm1, qword ptr [rip + 0x6bdb] # 0x8008 <_IO_stdin_used+0x8>
+    142d:      	vmovsd	xmm2, qword ptr [rip + 0x6bdb] # 0x8010 <_IO_stdin_used+0x10>
+    1435:      	nop	word ptr cs:[rax + rax]
+    1440:      	vfmadd213sd	xmm0, xmm1, xmm2 # xmm0 = (xmm1 * xmm0) + xmm2
+    1445:      	dec	rdi
+    1448:      	jne	0x1440 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::SIMD[DType.int, 1])+0x20>
+    144a:      	ret
+    144b:      	nop	dword ptr [rax + rax]
+
+00000000000014c0 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)>:
+    14c0:      	test	rsi, rsi
+    14c3:      	jle	0x154a <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x8a>
+    14c9:      	test	dl, 0x1
+    14cc:      	je	0x1507 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x47>
+    14ce:      	lea	rax, [rsi - 0x1]
+    14d2:      	movabs	rcx, 0x14057b7ef767814f
+    14dc:      	xor	edx, edx
+    14de:      	movabs	r8, 0x5851f42d4c957f2d
+    14e8:      	nop	dword ptr [rax + rax]
+    14f0:      	mov	r9, rcx
+    14f3:      	and	r9, rax
+    14f6:      	mov	qword ptr [rdi + 8*rdx], r9
+    14fa:      	inc	rdx
+    14fd:      	add	rcx, r8
+    1500:      	cmp	rsi, rdx
+    1503:      	jne	0x14f0 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x30>
+    1505:      	jmp	0x154a <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x8a>
+    1507:      	movabs	rcx, 0x139408dcbbf7a44
+    1511:      	xor	eax, eax
+    1513:      	nop	word ptr cs:[rax + rax]
+    1520:      	mov	rdx, rcx
+    1523:      	shl	rdx, 0xd
+    1527:      	xor	rdx, rcx
+    152a:      	mov	r8, rdx
+    152d:      	shr	r8, 0x7
+    1531:      	xor	r8, rdx
+    1534:      	mov	rcx, r8
+    1537:      	shl	rcx, 0x11
+    153b:      	xor	rcx, r8
+    153e:      	mov	qword ptr [rdi + 8*rax], rcx
+    1542:      	inc	rax
+    1545:      	cmp	rsi, rax
+    1548:      	jne	0x1520 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x60>
+    154a:      	ret
+    154b:      	nop	dword ptr [rax + rax]
+

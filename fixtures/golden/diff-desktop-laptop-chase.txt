@@ -1,0 +1,8 @@
+diff: cycles 2353000000 -> 538000000 (-77.1%), rows changed 6
+  addr A  addr B     cycles A     cycles B         delta  cause B instruction
+    1340    1340   2283000000    467000000   -1816000000  mem     mov rax, qword ptr [rdi + 8*rax]
+    14c3    14f3            0     30000000      30000000  fe      and r9, rax
+    14cd    14fa     10000000     38000000      28000000  dep     inc rdx
+    14c6       -     22000000            0     -22000000  -       add rcx, r8
+    14d0    1500     21000000      3000000     -18000000  dep     cmp rsi, rdx
+    1347    1347     17000000            0     -17000000  busy    jne 0x1340 <cwprobe::chase_k(::Pointer[True, MutUntrackedOri

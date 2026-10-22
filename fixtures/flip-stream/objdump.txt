@@ -1,0 +1,120 @@
+0000000000008060 <cwprobe::stream_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1])>:
+    8060:      	cmp	x1, #0x1
+    8064:      	b.lt	0x816c <cwprobe::stream_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1])+0x10c>
+    8068:      	add	x8, x0, #0x80
+    806c:      	mov	x9, #0x7fffffffffffffe0 // =9223372036854775776
+    8070:      	mov	w10, #0x20              // =32
+    8074:      	movi	v0.2d, #0000000000000000
+    8078:      	movi	v4.2d, #0000000000000000
+    807c:      	movi	v3.2d, #0000000000000000
+    8080:      	movi	v2.2d, #0000000000000000
+    8084:      	movi	v1.2d, #0000000000000000
+    8088:      	movi	v16.2d, #0000000000000000
+    808c:      	movi	v7.2d, #0000000000000000
+    8090:      	movi	v6.2d, #0000000000000000
+    8094:      	movi	v5.2d, #0000000000000000
+    8098:      	movi	v17.2d, #0000000000000000
+    809c:      	movi	v18.2d, #0000000000000000
+    80a0:      	movi	v19.2d, #0000000000000000
+    80a4:      	movi	v20.2d, #0000000000000000
+    80a8:      	movi	v21.2d, #0000000000000000
+    80ac:      	movi	v22.2d, #0000000000000000
+    80b0:      	movi	v23.2d, #0000000000000000
+    80b4:      	nop
+    80b8:      	nop
+    80bc:      	nop
+    80c0:      	ldp	q25, q24, [x8, #-0x60]
+    80c4:      	ldp	q26, q27, [x8, #-0x80]
+    80c8:      	add	v0.2d, v27.2d, v0.2d
+    80cc:      	add	v23.2d, v24.2d, v23.2d
+    80d0:      	add	v21.2d, v26.2d, v21.2d
+    80d4:      	ldp	q27, q26, [x8, #-0x20]
+    80d8:      	add	v22.2d, v25.2d, v22.2d
+    80dc:      	ldp	q24, q25, [x8, #-0x40]
+    80e0:      	add	v18.2d, v25.2d, v18.2d
+    80e4:      	add	v20.2d, v26.2d, v20.2d
+    80e8:      	add	v17.2d, v24.2d, v17.2d
+    80ec:      	ldp	q25, q24, [x8, #0x20]
+    80f0:      	add	v19.2d, v27.2d, v19.2d
+    80f4:      	add	v5.2d, v24.2d, v5.2d
+    80f8:      	ldp	q26, q27, [x8]
+    80fc:      	add	v7.2d, v27.2d, v7.2d
+    8100:      	add	v16.2d, v26.2d, v16.2d
+    8104:      	add	v6.2d, v25.2d, v6.2d
+    8108:      	ldp	q25, q24, [x8, #0x60]
+    810c:      	ldp	q26, q27, [x8, #0x40]
+    8110:      	add	v3.2d, v27.2d, v3.2d
+    8114:      	add	v1.2d, v24.2d, v1.2d
+    8118:      	add	v4.2d, v26.2d, v4.2d
+    811c:      	add	v2.2d, v25.2d, v2.2d
+    8120:      	cbz	x9, 0x8138 <cwprobe::stream_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1])+0xd8>
+    8124:      	add	x8, x8, #0x100
+    8128:      	sub	x9, x9, #0x20
+    812c:      	cmp	x10, x1
+    8130:      	add	x10, x10, #0x20
+    8134:      	b.lt	0x80c0 <cwprobe::stream_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1])+0x60>
+    8138:      	add	v17.2d, v17.2d, v21.2d
+    813c:      	add	v18.2d, v18.2d, v0.2d
+    8140:      	add	v19.2d, v19.2d, v22.2d
+    8144:      	add	v20.2d, v20.2d, v23.2d
+    8148:      	add	v0.2d, v16.2d, v4.2d
+    814c:      	add	v3.2d, v7.2d, v3.2d
+    8150:      	add	v2.2d, v6.2d, v2.2d
+    8154:      	add	v1.2d, v5.2d, v1.2d
+    8158:      	add	v0.2d, v17.2d, v0.2d
+    815c:      	add	v3.2d, v18.2d, v3.2d
+    8160:      	add	v2.2d, v19.2d, v2.2d
+    8164:      	add	v1.2d, v20.2d, v1.2d
+    8168:      	b	0x817c <cwprobe::stream_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1])+0x11c>
+    816c:      	movi	v0.2d, #0000000000000000
+    8170:      	movi	v3.2d, #0000000000000000
+    8174:      	movi	v2.2d, #0000000000000000
+    8178:      	movi	v1.2d, #0000000000000000
+    817c:      	add	v4.2d, v0.2d, v2.2d
+    8180:      	add	v5.2d, v3.2d, v1.2d
+    8184:      	zip1	v0.2d, v0.2d, v3.2d
+    8188:      	zip1	v1.2d, v2.2d, v1.2d
+    818c:      	add	v0.2d, v0.2d, v1.2d
+    8190:      	add	v4.2d, v4.2d, v5.2d
+    8194:      	addp	d0, v0.2d
+    8198:      	mov	x9, v4.d[1]
+    819c:      	fmov	x8, d0
+    81a0:      	add	x0, x8, x9
+    81a4:      	ret
+    81a8:      	nop
+    81ac:      	nop
+
+0000000000008260 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)>:
+    8260:      	subs	x8, x1, #0x1
+    8264:      	b.lt	0x82d8 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x78>
+    8268:      	tbz	w2, #0x0, 0x82a4 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x44>
+    826c:      	mov	x9, #0x814f             // =33103
+    8270:      	mov	x10, #0x7f2d            // =32557
+    8274:      	movk	x9, #0xf767, lsl #16
+    8278:      	movk	x10, #0x4c95, lsl #16
+    827c:      	movk	x9, #0x7b7e, lsl #32
+    8280:      	movk	x10, #0xf42d, lsl #32
+    8284:      	movk	x9, #0x1405, lsl #48
+    8288:      	movk	x10, #0x5851, lsl #48
+    828c:      	and	x11, x9, x8
+    8290:      	add	x9, x9, x10
+    8294:      	subs	x1, x1, #0x1
+    8298:      	str	x11, [x0], #0x8
+    829c:      	b.ne	0x828c <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x2c>
+    82a0:      	b	0x82d8 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x78>
+    82a4:      	mov	x8, #0x7a44             // =31300
+    82a8:      	movk	x8, #0xcbbf, lsl #16
+    82ac:      	movk	x8, #0x408d, lsl #32
+    82b0:      	movk	x8, #0x139, lsl #48
+    82b4:      	nop
+    82b8:      	nop
+    82bc:      	nop
+    82c0:      	eor	x8, x8, x8, lsl #13
+    82c4:      	subs	x1, x1, #0x1
+    82c8:      	eor	x8, x8, x8, lsr #7
+    82cc:      	eor	x8, x8, x8, lsl #17
+    82d0:      	str	x8, [x0], #0x8
+    82d4:      	b.ne	0x82c0 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x60>
+    82d8:      	ret
+    82dc:      	nop
+

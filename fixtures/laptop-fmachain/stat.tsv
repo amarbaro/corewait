@@ -1,0 +1,13 @@
+bad	458841
+be	4936601679
+cycles	1411289322
+fe	1366273
+instructions	1058845619
+ret	706730495
+slots	5645157288
+time_us	508960
+note	Skylake topdown-* events over 4 slots per cycle, two perf stat passes of 3 counters each; backend = what fetch bubbles, retiring and bad speculation leave
+p_cycles	1000000
+p_mem	20000
+p_fe	1000000
+p_br	10000

@@ -1,0 +1,8 @@
+run: cycles 1597827350 ipc 0.13 | frontend 1.1% backend 94.9% backend-mem 71.7% retiring 4.0% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+fn  96.8%  cwprobe::chase_k
+fn   3.2%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    8048  96.8%   1528000000  1177000000         0         0  mem    ldr x1, [x0, x1, lsl #3]
+    8288   1.1%     18000000     1000000         0         0  dep    add x9, x9, x10
+    8290   1.1%     17000000     3000000         0         0  dep    b.ne 0x8280 <cwprobe::fill_k(::Pointer[True, MutUntrackedOri
+    8284   1.0%     16000000     4000000         0         0  busy   str x11, [x0], #0x8

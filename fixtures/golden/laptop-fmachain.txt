@@ -1,0 +1,7 @@
+run: cycles 1411289322 ipc 0.75 | frontend 0.0% bad-spec 0.0% backend 87.4% retiring 12.5% (Skylake topdown-* events over 4 slots per cycle, two perf stat passes of 3 counters each; backend = what fetch bubbles, retiring and bad speculation leave)
+fn  99.9%  cwprobe::fmachain_k
+fn   0.1%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    1445  99.9%   1409000000           0   1000000         0  dep    dec rdi
+    1440   0.1%      1000000           0         0         0  dep    vfmadd213sd xmm0, xmm1, xmm2 # xmm0 = (xmm1 * xmm0) + xmm2
+    153e   0.1%      1000000           0         0         0  dep    mov qword ptr [rdi + 8*rax], rcx

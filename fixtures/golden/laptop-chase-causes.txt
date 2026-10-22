@@ -1,0 +1,8 @@
+run: cycles 592469150 ipc 0.44 | frontend 2.9% bad-spec 0.0% backend 87.7% retiring 9.4% (Skylake topdown-* events over 4 slots per cycle, two perf stat passes of 3 counters each; backend = what fetch bubbles, retiring and bad speculation leave)
+cause           cycles   share
+mem          467000000  100.0%
+fe                   0    0.0%
+dep                  0    0.0%
+branch               0    0.0%
+busy                 0    0.0%
+total        467000000  raw 467000000

@@ -1,0 +1,8 @@
+run: cycles 2502309118 ipc 0.64 | frontend 74.7% backend 2.5% retiring 12.8% (Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events)
+cause           cycles   share
+mem                  0    0.0%
+fe                   0    0.0%
+dep            9000000    0.4%
+branch      2063000000   99.6%
+busy                 0    0.0%
+total       2072000000  raw 2072000000

@@ -1,0 +1,12 @@
+be	15392641349
+cycles	2835696145
+fe	205773920
+instructions	1444175243
+ret	1241014975
+slots	17014176870
+time_us	657970
+note	Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events
+p_cycles	1000000
+p_mem	10000
+p_fe	1000
+p_br	10000

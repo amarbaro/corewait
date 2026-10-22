@@ -1,0 +1,7 @@
+run: cycles 2485498293 ipc 0.75 | frontend 0.1% backend 90.8% retiring 8.3% (Zen 4 de_no_dispatch_per_slot and ex_ret_ops over 6 slots per cycle, the PipelineL1 events)
+fn 100.0%  cwprobe::fmachain_k
+fn   0.0%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    1415  99.9%   2478000000           0      4000         0  dep    dec rdi
+    1418   0.0%      1000000           0         0         0  busy   jne 0x1410 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::S
+    14f7   0.0%      1000000           0         0         0  busy   xor rdx, rcx

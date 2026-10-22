@@ -1,0 +1,5 @@
+device	xiaomi
+binary	cwprobe-xiaomi
+sha256	ec07230235af2a28bdadf1dd5db908dafef5928186b441bb590366de0ef2b541
+command	./cwprobe-xiaomi chase
+date	2026-10-21T23:07:39+02:00

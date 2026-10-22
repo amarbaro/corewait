@@ -1,0 +1,18 @@
+run: cycles 1237364333 ipc 0.83 | frontend 25.0% backend 0.1% backend-mem 0.0% retiring 75.0% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+fn   9.1%  cwprobe::up
+fn   7.2%  cwprobe::down
+fn  83.6%  cwprobe::branchy_k
+fn   0.1%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    8208  38.1%    470000000           0         0  20000000  branch b 0x8220 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOri
+    8224  32.1%    396000000           0   3000000  14000000  branch tbz w8, #0x0, 0x820c <cwprobe::branchy_k(::Pointer[True, Mut
+    81d0   5.8%     72000000           0  25000000   4000000  fe     add x8, x0, x0, lsl #1
+    8214   5.0%     62000000           0  13000000   2000000  branch mov x2, x0
+    8230   4.8%     59000000           0  10000000   2000000  branch mov x2, x0
+    81e0   4.1%     51000000           0  16000000   1000000  dep    eor x0, x0, x0, lsr #3
+    8220   3.6%     44000000           0  12000000   1000000  branch ldrb w8, [x19], #0x8
+    81d8   3.2%     40000000           0   8000000   6000000  dep    ret
+    81e4   3.1%     38000000           0  15000000         0  dep    ret
+    822c   0.1%      1000000           0   1000000         0  busy   bl 0x81d0 <cwprobe::up(::SIMD[DType.uint64, 1])>
+    823c   0.1%      1000000           0         0         0  busy   ldp x20, x19, [sp, #0x10]
+    82bc   0.1%      1000000           0         0         0  dep    b.ne 0x82a8 <cwprobe::fill_k(::Pointer[True, MutUntrackedOri
