@@ -60,6 +60,15 @@ struct Insn(Copyable, Movable):
     var br: Int
 
 
+def rank(v: Int, r: Int) -> UInt128:
+    """Sort key: v above, (row from the end) below: ascending sort, read backwards = largest v first, then lowest row."""
+    return (UInt128(v) << 32) | UInt128(4294967295 - r)
+
+
+def unrank(k: UInt128) -> Int:
+    return 4294967295 - Int(k & 4294967295)
+
+
 def is_branch(mn: String) -> Bool:
     if mn.startswith("j") or mn.startswith("ret") or mn == "call" or mn.startswith("b."):
         return True
@@ -318,8 +327,11 @@ def load_stat(mut an: Analysis, path: String) raises:
         if f[0] == "note":
             an.note = String(f[1])
         else:
-            an.stat_keys.append(String(f[0]))
-            an.stat_vals.append(Int(f[1]))
+            try:
+                an.stat_vals.append(Int(f[1]))
+                an.stat_keys.append(String(f[0]))
+            except:
+                pass  # "<not counted>" in an older recording: the role is missing, as if not recorded
 
 
 def analyze(od: String, k: Int) raises -> Analysis:
@@ -406,14 +418,14 @@ def show(an: Analysis, func: String, top: Int, causes: Bool, bytes_: Int, bw: Fl
     for i in range(len(an.fns)):
         if sel[i] and an.raw[i] > 0:
             print("fn " + lpad(pct(an.raw[i], raw), 6) + "  " + an.fns[i])
-    var keys = List[Int]()  # cycles above, (row from the end) below: ascending sort, read backwards = most cycles first
+    var keys = List[UInt128]()  # 128 bits: a row past 2^39 cycles overflowed a 64-bit key and sorted last
     for r in range(len(an.ins)):
         if sel[an.ins[r].func] and an.ins[r].cyc > 0:
-            keys.append(an.ins[r].cyc * 16777216 + (16777215 - r))
+            keys.append(rank(an.ins[r].cyc, r))
     sort(keys)
     print(lpad("addr", 8) + lpad("cyc%", 7) + lpad("cycles", 13) + lpad("mem", 12) + lpad("fe", 10) + lpad("br", 10) + "  " + rpad("cause", 7) + "instruction")
     for i in range(min(top, len(keys))):
-        var ri = 16777215 - keys[len(keys) - 1 - i] % 16777216
+        var ri = unrank(keys[len(keys) - 1 - i])
         ref r = an.ins[ri]
         var text = String(r.text[byte = 0 : min(60, r.text.byte_length())])
         print(lpad(hexs(r.addr), 8) + lpad(pct(r.cyc, total), 7) + lpad(String(r.cyc), 13) + lpad(String(r.mem), 12) + lpad(String(r.fe), 10) + lpad(String(r.br), 10) + "  " + rpad(cname(cause_of(an, ri)), 7) + text)
@@ -455,6 +467,11 @@ def diff(a: Analysis, b: Analysis, top: Int):
     for r in b.ins:
         tb += r.cyc
     for fa in range(len(a.fns)):
+        var again = False  # one name, many instantiations (Mojo's are cut at "("): fn_rows already took them all
+        for q in range(fa):
+            again = again or a.fns[q] == a.fns[fa]
+        if again:
+            continue
         var ra = fn_rows(a, a.fns[fa])
         var rb = List[Int]()
         for fb in range(len(b.fns)):
@@ -491,15 +508,15 @@ def diff(a: Analysis, b: Analysis, top: Int):
         if not found:
             for r in fn_rows(b, b.fns[fb]):
                 d_row += [-1, r, b.ins[r].cyc]
-    var keys = List[Int]()
+    var keys = List[UInt128]()
     for e in range(len(d_row) // 3):
         if d_row[3 * e + 2] != 0:
-            keys.append(abs(d_row[3 * e + 2]) * 16777216 + (16777215 - e))
+            keys.append(rank(abs(d_row[3 * e + 2]), e))
     sort(keys)
     print("diff: cycles " + String(ta) + " -> " + String(tb) + " (" + spct(ta, tb) + "), rows changed " + String(len(keys)))
     print(lpad("addr A", 8) + lpad("addr B", 8) + lpad("cycles A", 13) + lpad("cycles B", 13) + lpad("delta", 14) + "  " + rpad("cause B", 8) + "instruction")
     for q in range(min(top, len(keys))):
-        var e = 16777215 - keys[len(keys) - 1 - q] % 16777216
+        var e = unrank(keys[len(keys) - 1 - q])
         var ia = d_row[3 * e]
         var ib = d_row[3 * e + 1]
         var text = a.ins[ia].text if ia >= 0 else b.ins[ib].text

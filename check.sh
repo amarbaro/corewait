@@ -60,7 +60,10 @@ grep -q "(+0.0%), rows changed 0" .work/diff-self.txt || fail diff "a fixture ag
 if [ -n "${FREEZE:-}" ]; then cp .work/diff-chase.txt fixtures/golden/diff-desktop-laptop-chase.txt; fi
 cmp -s .work/diff-chase.txt fixtures/golden/diff-desktop-laptop-chase.txt || fail golden "diff desktop-laptop chase differs"
 gawk '/mov rax, qword ptr \[rdi \+ 8\*rax\]/ { ok = ($3 > 0 && $4 > 0 && $5 == $4 - $3) } END { exit !ok }' .work/diff-chase.txt || fail diff "the chase load is not aligned across devices"
-echo "ok 5 diff: self is zero, cross-device chase load aligned, frozen"
+# one name with two instantiations (Mojo's, cut at "("): each row once (it was aligned once per instantiation)
+./corewait diff fixtures/dupname/a fixtures/dupname/b > .work/diff-dup.txt
+grep -q "rows changed 1$" .work/diff-dup.txt || fail diff "a repeated function name counted its rows twice: $(head -1 .work/diff-dup.txt)"
+echo "ok 5 diff: self is zero, cross-device chase load aligned, frozen, repeated names once"
 
 # 6. budget passes and fails on two prepared files
 ./corewait budget fixtures/desktop-chase fixtures/budget/pass.txt > .work/budget-pass.txt || fail budget "pass.txt breached: $(cat .work/budget-pass.txt)"
@@ -90,4 +93,21 @@ read -r secs kb < .work/perf1m/time.txt
 echo "perf: 1000000 rows, show $secs s, peak RSS $((kb / 1024)) MB"
 gawk -v s="$secs" -v kb="$kb" 'BEGIN { exit !(s < 1 && kb < 204800) }' || fail perf "show took $secs s, peak $((kb / 1024)) MB (limits 1 s, 200 MB)"
 echo "ok 8 performance"
+# 9. a row past 2^39 cycles (a long or merged run) still ranks first (a 64-bit sort key overflowed: it ranked last)
+./corewait show fixtures/bigcount --top 2 > .work/bigcount.txt
+gawk '$1 == "addr" { getline; exit !($1 == "1000") }' .work/bigcount.txt || fail sort "the 1e12-cycle row is not first: $(grep -A1 "^ *addr" .work/bigcount.txt | tail -1)"
+echo "ok 9 a 1e12-cycle row ranks first"
+
+# 10. an event perf could not count: stat.tsv leaves its role out (it wrote "<not counted>", which show died on) and
+#    derives no share from it (a missing backend made retiring 98%)
+mkdir -p .work/stat9
+for f in fixtures/statraw/*.raw; do
+    n=$(basename "$f" .raw); rm -rf ".work/stat9/$n"; mkdir -p ".work/stat9/$n"; cp "$f" ".work/stat9/$n/stat.raw"
+    ./corewait stat desktop ".work/stat9/$n"
+    gawk -F'\t' '$1 !~ /^(note|p_)/ && $2 !~ /^[0-9]+$/ { exit 1 }' ".work/stat9/$n/stat.tsv" || fail stat "$n: a non-numeric count in stat.tsv"
+done
+grep -q "^ret" .work/stat9/not-supported/stat.tsv && fail stat "retiring derived without a backend count"
+cp fixtures/desktop-chase/{objdump.txt,samples.tsv} .work/stat9/not-counted/
+./corewait show .work/stat9/not-counted --top 1 > .work/stat9/show.txt || fail stat "show on a stat.tsv with an uncounted event"
+echo "ok 10 uncounted events: left out, no share derived from them"
 echo "ALL OK"

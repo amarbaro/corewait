@@ -12,6 +12,7 @@ corewait show OUT [--top N] [--causes] [--fn SYMBOL] [--k K] [--bytes B --bw GBP
 corewait diff OUT_A OUT_B [--top N]           per-row cycle delta, rows of same-named functions aligned by LCS on the text
 corewait budget OUT FILE                      FILE lines "fn cause max-percent"; exit 1 on a breach (a CI gate for kernels)
 corewait merge OUT DIR...                     add repeated recordings of one binary (CW_DIV=20 shortens the sampling periods for a 40 ms kernel)
+corewait stat DEV OUT                         OUT/stat.tsv again from OUT/stat.raw (an event the CPU did not count is left out)
 corewait bw DEV                               sequential-read GB/s with 1, 2, 4 and all concurrent stream probes
 probes/cwprobe.mojo                           chase | stream | fmachain | branchy, ~0.5 s each, one dominant cause
 check.sh                                      CPU-only gate: build, record smoke, golden fixtures, mutant, 1M-row speed

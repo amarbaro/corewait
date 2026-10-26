@@ -1,0 +1,7 @@
+0000000000001000 <f(int)>:
+    1000: 	mov rax, qword ptr [rdi]
+    1004: 	ret
+
+0000000000002000 <f(float)>:
+    2000: 	add rax, 1
+    2004: 	ret

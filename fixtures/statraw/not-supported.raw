@@ -1,0 +1,4 @@
+1000000,,ls_not_halted_cyc:u,100,100.00,,
+900000,,instructions:u,100,100.00,,
+<not supported>,,de_no_dispatch_per_slot.backend_stalls:u,0,0.00,,
+100000,,de_no_dispatch_per_slot.no_ops_from_frontend:u,100,100.00,,

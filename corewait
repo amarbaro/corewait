@@ -4,6 +4,7 @@
 # corewait bw DEV                               sequential-read GB/s with 1, 2, 4 and all concurrent cwprobe stream processes
 # corewait merge OUT DIR...                     add repeated recordings of one binary into OUT
 # corewait build DEV                            build/cwprobe-DEV, the probe cross-compiled for the device
+# corewait stat DEV OUT                         OUT/stat.tsv again from OUT/stat.raw
 # BINARY is a host ELF, unstripped; on a remote device it is pushed to the device work dir first.
 # samples.tsv: event TAB dso TAB vaddr TAB count   event in cycles|mem|fe|br, vaddr as objdump prints it, count in raw events
 # stat.tsv:    name TAB count                      cycles instructions slots fe be be_mem ret bad time_us (slots = issue slots, or cycles), note, p_ROLE
@@ -129,12 +130,13 @@ objdump_of() {
 stat_tsv() {
     local dev=$1 out=$2 col=$3 w tbl; read -r w tbl <<<"$(stat_events "$dev")"
     gawk -F, -v tbl="$tbl" -v w="$w" -v col="$col" 'BEGIN { n = split(tbl, a, " "); for (i = 1; i <= n; i++) { split(a[i], kv, "="); role[kv[2] ":u"] = kv[1] } }
-        $col in role { v[role[$col]] = $1 }
+        $col in role && $1 ~ /^[0-9.]+$/ { v[role[$col]] = $1 }   # "<not counted>", "<not supported>": the role stays out
         /^Total test time/ { v["time_ms"] = $2 * 1000 }
         END { v["time_us"] = int(v["time_ms"] * 1000); delete v["time_ms"]
               if (!("slots" in v)) v["slots"] = v["cycles"] * w
-              if ("issued" in v) { v["bad"] = v["issued"] - v["ret"] + v["rec"]; v["be"] = v["slots"] - v["fe"] - v["ret"] - v["bad"]; delete v["issued"]; delete v["rec"] }
-              else if (!("ret" in v)) v["ret"] = v["slots"] - v["fe"] - v["be"]
+              if ("issued" in v && "ret" in v && "rec" in v) { v["bad"] = v["issued"] - v["ret"] + v["rec"]; if ("fe" in v) v["be"] = v["slots"] - v["fe"] - v["ret"] - v["bad"] }
+              else if (!("ret" in v) && "fe" in v && "be" in v) v["ret"] = v["slots"] - v["fe"] - v["be"]
+              delete v["issued"]; delete v["rec"]   # a share is derived only from counted parts
               for (r in v) print r "\t" v[r] }' "$out/stat.raw" | sort > "$out/stat.tsv"
     { printf "note\t%s\n" "$(stat_note "$dev")"; for spec in $(sample_events "$dev"); do IFS="|" read -r role _ p <<<"$spec"; p=$((p / ${CW_DIV:-1})); printf "p_%s\t%s\n" "$role" "$p"; done; } >> "$out/stat.tsv"
 }
@@ -230,6 +232,7 @@ case "$cmd" in
     attached) attached "$@" ;;
     merge)  merge "$@" ;;
     build)  build "$@" ;;
+    stat)   read -r kind _ <<<"$(dev_row "$1")"; stat_tsv "$1" "$2" "$([ "$kind" = perf ] && echo 3 || echo 2)" ;;   # OUT/stat.tsv again from OUT/stat.raw
     show)   prep "$1" "${2:-}"; exec "$here/build/corewait-an" show "$@" ;;
     diff)   prep "$1" "${3:-}"; prep "${2:-}" "${4:-}"; exec "$here/build/corewait-an" diff "$@" ;;
     budget) exec "$here/build/corewait-an" budget "$@" ;;
