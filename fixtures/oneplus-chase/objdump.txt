@@ -1,0 +1,10 @@
+0000000000008020 <cwprobe::chase_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.uint64, 1],::SIMD[DType.int, 1])>:
+    8020:      	cmp	x2, #0x1
+    8024:      	b.lt	0x8034 <cwprobe::chase_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.uint64, 1],::SIMD[DType.int, 1])+0x14>
+    8028:      	ldr	x1, [x0, x1, lsl #3]
+    802c:      	subs	x2, x2, #0x1
+    8030:      	b.ne	0x8028 <cwprobe::chase_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.uint64, 1],::SIMD[DType.int, 1])+0x8>
+    8034:      	mov	x0, x1
+    8038:      	ret
+    803c:      	nop
+

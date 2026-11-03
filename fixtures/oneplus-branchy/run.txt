@@ -1,0 +1,2 @@
+branchy mb 1 steps 110362624 s 0.500534791 check 0 Msteps/s 220.48941648893293
+simpleperf I cmd_record.cpp:760] Samples recorded: 3820. Samples lost: 0.

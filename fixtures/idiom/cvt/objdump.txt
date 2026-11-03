@@ -1,0 +1,4 @@
+0000000000001000 <k>:
+    1000:      	vcvtps2ph	xmmword ptr [rdi], ymm0, 4
+    1004:      	nop
+    1008:      	ret

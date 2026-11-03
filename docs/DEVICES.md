@@ -11,7 +11,7 @@ column that matches the question (a single-threaded kernel: 1t; a threaded one: 
 | laptop | i5-6200U, Skylake, 4 threads | 16.5 | 23.8 | 27.0 | 27.5 | 2026-10-21 | none |
 | flip | Z Flip4, X2/A710/A510, 6 usable cpus | 13.0 | 41.1 | 44.2 | 46.9 | 2026-10-21 | cpu 5 (A710): cpu 7 and 6 were isolated |
 | xiaomi | 17 Ultra, Oryon, 8 cpus | 72.5 | 70.8 | 69.3 | 66.6 | 2026-10-21 | none |
-| oneplus | A76 | PENDING | | | | device absent | |
+| oneplus | 7T Pro, A76/A55, Android 12 | 15.8 | 19.6 | 19.6 | 19.4 (6t) | 2026-10-30 | none |
 
 - Xiaomi: the numbers were measured before the phone dropped off wifi (adb offline, 2026-10-21 23:30). Its fixtures keep
   the stat.tsv without `time_us` (no `--bytes` on them), and the re-record plus a fresh bw are **PENDING (device
@@ -34,7 +34,7 @@ column that matches the question (a single-threaded kernel: 1t; a threaded one: 
 | laptop i5-6200U (Skylake, AVX2) | laptop | ssh `$CW_LAPTOP_SSH` | `perf` 7.2.6  | cycles, instructions, `topdown-fetch-bubbles`, `-recovery-bubbles`, `-slots-issued` |
 | Xiaomi 17 Ultra (Oryon, SVE2, SME) | xiaomi | adb `$CW_XIAOMI_ADB` (wifi) | `/system/bin/simpleperf` | cpu-cycles, instructions, raw-stall-backend, raw-stall-frontend, raw-stall-backend-mem, raw-l1d-cache-refill, raw-l2d-cache-refill (all `:u`) |
 | Galaxy Z Flip4 (X2/A710/A510) | flip | adb `$CW_FLIP_ADB` | `/system/bin/simpleperf` | the same set as Xiaomi |
-| OnePlus (A76) | oneplus | adb `$CW_ONEPLUS_ADB` | simpleperf | assume the same set; check when attached |
+| OnePlus (A76) | oneplus | adb `$CW_ONEPLUS_ADB` | simpleperf | the phone set; Android 12 simpleperf: no `report --print-event-count`, record uses `-n` |
 
 `simpleperf stat -a` and kernel samples need root: always profile a command you start (`-- cmd`), with `:u` events.
 `simpleperf record -e cpu-cycles:u -- cmd` works on both phones (133 / 61 samples on `dd`).

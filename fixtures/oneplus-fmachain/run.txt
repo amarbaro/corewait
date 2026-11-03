@@ -1,0 +1,2 @@
+fmachain mb 1 steps 352321536 s 0.505310885 check 0 Msteps/s 697.2371790486959
+simpleperf I cmd_record.cpp:760] Samples recorded: 809. Samples lost: 0.

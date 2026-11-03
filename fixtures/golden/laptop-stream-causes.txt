@@ -2,7 +2,7 @@ run: cycles 1178005963 ipc 0.70 | frontend 0.7% bad-spec 0.0% backend 78.6% reti
 cause           cycles   share
 mem          933000000   99.9%
 fe                   0    0.0%
-dep                  0    0.0%
+dep            1000000    0.1%
 branch               0    0.0%
-busy           1000000    0.1%
+busy                 0    0.0%
 total        934000000  raw 934000000

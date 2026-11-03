@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# corewait record DEV OUT -- BINARY [ARGS...]   run BINARY under the device's profiler, write OUT/{samples,stat}.tsv + objdump.txt + meta.txt
+# corewait record DEV OUT [--dso LIB|auto] [--no-stat] [--pid PID] -- [K=V ...] BINARY [ARGS...]   run BINARY (K=V: its environment) under the device's profiler, write OUT/{samples,stat}.tsv + objdump.txt + meta.txt
+#   --dso reports one loaded library of a host process (auto: the one with the most cycles; a non-ELF BINARY implies it), OUT/dsos.tsv ranks them all
+#   --no-stat skips the second run of the program; --pid samples a running process while BINARY (`sleep 60`) runs, implies --dso auto --no-stat. perf devices only
+# corewait pick OUT LIB|auto                    report another library of OUT/perf.data, without a new run
 # corewait show OUT [BINARY] | diff OUT_A OUT_B [BIN_A BIN_B] | budget OUT FILE      the Mojo analyzer (build/corewait-an), src/corewait.mojo
 # corewait bw DEV                               sequential-read GB/s with 1, 2, 4 and all concurrent cwprobe stream processes
 # corewait merge OUT DIR...                     add repeated recordings of one binary into OUT
@@ -30,7 +33,7 @@ esac; }
 sample_events() { case "$1" in
     desktop) echo "cycles|cycles|1000000 mem|ls_any_fills_from_sys.dram_io_all|10000 fe|ic_tag_hit_miss.instruction_cache_miss|1000 br|ex_ret_brn_misp|10000" ;;
     laptop)  echo "cycles|cycles|1000000 mem|event=0xd1,umask=0x08|20000 fe|event=0x9c,umask=0x01|1000000 br|branch-misses|10000" ;;   # l1_miss, idq_uops_not_delivered.core
-    *)       echo "cycles|cpu-cycles|1000000 mem|raw-stall-backend-mem|1000000 mem|raw-bus-access-rd|1000000 fe|raw-stall-frontend|1000000 br|raw-br-mis-pred-retired|1000000" ;;
+    *)       echo "cycles|cpu-cycles|1000000 mem|raw-stall-backend-mem|1000000 mem|raw-bus-access-rd|1000000 fe|raw-stall-frontend|1000000 br|raw-br-mis-pred-retired|10000" ;;
 esac; }
 # role=event of the whole-run stat pass; slots=, issued= and rec= (topdown) derive bad and be, else slots = cycles * slots-per-cycle
 stat_events() { case "$1" in
@@ -92,20 +95,39 @@ pin_prefix() { local how=$1 target=$2 pin=$3 m
     fail pin "no cpu mask of $pin accepted by taskset on $target"; }
 
 record() {
-    local dev=$1 out=$2; shift 2; [ "${1:-}" = -- ] && shift
-    local bin=${1:?usage: corewait record DEV OUT -- BINARY [ARGS...]}; shift
-    [ -x "$bin" ] || fail record "$bin is not an executable file"
+    local dev=$1 out=$2 dso="" nostat="" pid=""; shift 2
+    while :; do case "${1:-}" in
+        --dso) dso=${2:?--dso LIB|auto}; shift 2 ;;
+        --no-stat) nostat=1; shift ;;
+        --pid) pid=${2:?--pid PID}; dso=${dso:-auto}; nostat=1; shift 2 ;;
+        *) break ;;
+    esac; done
+    [ "${1:-}" = -- ] && shift
+    [ "${1:-}" = env ] && shift  # `-- env K=V ... BINARY`: the K=V pairs below, the profiled program stays BINARY
+    local envs=""; while [[ "${1:-}" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; do envs+="$(printf %q "$1") "; shift; done
+    local bin=${1:?usage: corewait record DEV OUT -- [K=V ...] BINARY [ARGS...]} asked=$1; shift
+    [ -x "$bin" ] || [[ "$bin" == */* ]] || bin=$(command -v "$bin" 2>/dev/null) || true  # a bare name: PATH
+    [ -x "$bin" ] || fail record "$asked is not an executable file"
+    local args=""; [ $# -eq 0 ] || args=$(printf '%q ' "$@")   # each ARG stays one word through bash -c, ssh and adb shell
     local kind how target wd mb serial pin; dev_row "$dev" >/dev/null; read -r kind how target wd mb serial pin <<<"$(dev_row "$dev")"
     lock "$how" "$serial"
+    [ "$(head -c4 "$bin")" = $'\x7fELF' ] || dso=${dso:-auto}  # a script: the interpreter's libraries hold the samples
+    [ -z "$dso" ] || [ "$kind" = perf ] || fail record "--dso, --pid and a script BINARY need a perf device"
     mkdir -p "$out"; out=$(readlink -f "$out")
     local name cmd rwd=$wd; name=$(basename "$bin")
     if [ "$how" = local ]; then
-        cmd="$(readlink -f "$bin") $*"; rwd=$out
+        cmd="$(printf %q "$(realpath -s "$bin")") $args"; rwd=$out  # -s: a venv python is a symlink, resolved it loses the venv
     else
-        dsh "$how" "$target" "mkdir -p $wd"; put "$how" "$target" "$wd" "$bin"; DWD=$wd; rwd=.; cmd="./$name $*"
+        dsh "$how" "$target" "mkdir -p $(printf %q "$wd")"; put "$how" "$target" "$wd" "$bin"; DWD=$wd; rwd=.; cmd="./$(printf %q "$name") $args"
     fi
+    [ -n "$envs" ] && cmd="env $envs$cmd"
     cmd="$(pin_prefix "$how" "$target" "$pin") $cmd"; cmd=${cmd# }
-    "record_$kind" "$dev" "$out" "$how" "$target" "$cmd" "$name" "$rwd" "$bin"
+    "record_$kind" "$dev" "$out" "$how" "$target" "$cmd" "$name" "$(printf %q "$rwd")" "$bin"
+    if [ "$kind" = perf ]; then
+        dsos_of "$out"
+        if [ -n "$dso" ]; then bin=$(dso_path "$out" "$dso"); name=$(basename "$bin"); perf_samples "$out" "$name" "$bin" "$bin"
+        else perf_samples "$out" "$name" "$bin" ""; fi
+    fi
     objdump_of "$bin" "$out"
     { echo "device	$dev"; echo "binary	$name"; echo "sha256	$(sha256sum "$bin" | cut -d' ' -f1)"
       echo "command	$cmd"; echo "hostbin	$(readlink -f "$bin")"; echo "date	$(date -Is)"; } > "$out/meta.txt"
@@ -116,14 +138,17 @@ vaddr_delta() { llvm-readelf -lW "$1" | gawk '/^ *LOAD/ && / E / { print strtonu
 
 # OUT/objdump.txt: llvm-objdump of BIN, kept to the functions that hold samples (intel syntax: destination first, as on ARM)
 objdump_of() {
-    llvm-objdump -d --no-show-raw-insn --x86-asm-syntax=intel "$1" | gawk -v samples="$2/samples.tsv" '
+    local dis="llvm-objdump -d --no-show-raw-insn --x86-asm-syntax=intel"
+    [ "$($dis "$1" 2>/dev/null | head -5 | wc -l)" -ge 4 ] || dis="objdump -d --no-show-raw-insn -M intel"   # llvm prints nothing for some stripped system libraries
+    $dis "$1" | gawk -v samples="$2/samples.tsv" '
         BEGIN { while ((getline l < samples) > 0) { split(l, f, "\t"); hit[f[3]] = 1 } }
         function flush() { if (keep) printf "%s", blk; blk = ""; keep = 0 }
         /^[0-9a-f]+ </ { flush() }
         { blk = blk $0 "\n" }
         /^ +[0-9a-f]+:/ { a = $1; sub(/:$/, "", a); if (a in hit) keep = 1 }
-        END { flush() }' > "$2/objdump.txt"
-    [ -s "$2/objdump.txt" ] || fail objdump "no sampled address of $2/samples.tsv found in $1"
+        END { flush() }' > "$2/objdump.txt.new"
+    [ -s "$2/objdump.txt.new" ] || { rm -f "$2/objdump.txt.new"; fail objdump "no sampled address of $2/samples.tsv found in $1"; }
+    mv "$2/objdump.txt.new" "$2/objdump.txt"
 }
 
 # OUT/stat.tsv from the stat pass's csv ($1 = column holding the event name)
@@ -147,42 +172,73 @@ record_perf() {
         IFS="|" read -r role e p <<<"$spec"; p=$((p / ${CW_DIV:-1}))
         if [ "${e#*=}" = "$e" ]; then ev="$ev -e '$e/period=$p,name=$role/u'"; else ev="$ev -e 'cpu/$e,period=$p,name=$role/u'"; fi
     done
-    dsh "$how" "$target" "perf record -q -o $rwd/perf.data $ev -- $cmd" > "$out/run.txt" 2>&1 \
+    dsh "$how" "$target" "perf record -q -o $rwd/perf.data $ev ${pid:+-p $pid} -- $cmd" > "$out/run.txt" 2>&1 \
         || fail record "perf record: $(tail -3 "$out/run.txt")"
     read -r w tbl <<<"$(stat_events "$dev")"
-    dsh "$how" "$target" "rm -f $rwd/stat.raw"   # one perf stat pass per ";" group: more events than counters would multiplex and skew the shares
-    for spec in $tbl ";"; do
+    dsh "$how" "$target" "rm -f $rwd/stat.raw; touch $rwd/stat.raw"   # one perf stat pass per ";" group: more events than counters would multiplex and skew the shares
+    [ -n "$nostat" ] || for spec in $tbl ";"; do
         if [ "$spec" = ";" ]; then dsh "$how" "$target" "perf stat -x, --append -o $rwd/stat.raw $st -- $cmd" > /dev/null 2>&1 || fail record "perf stat"; st=""
         else st="$st -e ${spec#*=}:u"; fi
     done
     [ "$how" = local ] || get "$how" "$target" "$DWD" "$out" perf.data stat.raw
-    perf script -i "$out/perf.data" --show-mmap-events -F event,period,ip,dso 2> /dev/null | gawk -v name="$name" \
-        -v delta="$(vaddr_delta "$bin")" '
-        /PERF_RECORD_MMAP2.*r-xp/ { match($0, /\[0x[0-9a-f]+\(0x[0-9a-f]+\) @ 0x[0-9a-f]+/); split(substr($0, RSTART + 1, RLENGTH - 1), f, /[(\) @]+/)
-                                   path = $NF; m++; start[m] = strtonum(f[1]); len[m] = strtonum(substr(f[2], 1)); pgoff[m] = strtonum(f[3]); mp[m] = path; next }
-        / [0-9a-f]+ \(/ { ev = $2; sub(/:$/, "", ev); ip = strtonum("0x" $3); path = $4; gsub(/[()]/, "", path)
-                          for (i = m; i >= 1; i--) if (mp[i] == path && path ~ "/" name "$" && ip >= start[i] && ip < start[i] + len[i]) {
-                              c[ev "\t" name "\t" sprintf("%x", ip - start[i] + pgoff[i] + delta)] += $1; break } }
-        END { for (k in c) print k "\t" c[k] }' | sort -k1,1 -k3,3 > "$out/samples.tsv"
-    [ -s "$out/samples.tsv" ] || fail record "no samples for $name in $out/perf.data (see $out/run.txt)"
     stat_tsv "$dev" "$out" 3
 }
 
+# OUT/dsos.tsv: percent TAB cycles TAB path, hottest first, from OUT/perf.data
+dsos_of() {
+    perf script -i "$1/perf.data" -F event,period,ip,dso 2> /dev/null | gawk -v OFS='\t' '
+        / [0-9a-f]+ \(/ && $2 == "cycles:" { p = $4; gsub(/[()]/, "", p); c[p] += $1; t += $1 }
+        END { for (p in c) printf "%.1f\t%d\t%s\n", 100 * c[p] / t, c[p], p }' | sort -k2,2nr > "$1/dsos.tsv"
+}
+# the library file for WANT: auto = the hottest of OUT/dsos.tsv that is a file on disk (not JIT, not anonymous)
+dso_path() {
+    local out=$1 want=$2 f
+    if [ "$want" != auto ]; then [ -f "$want" ] || fail dso "$want is not a file"; readlink -f "$want"; return; fi
+    while IFS=$'\t' read -r _ _ f; do [ -f "$f" ] && { echo "$f"; return; }; done < "$out/dsos.tsv"
+    fail dso "no library on disk in $out/dsos.tsv"
+}
+# OUT/samples.tsv from OUT/perf.data: the samples of file FULL, else of any mapped file called NAME (a remote device's path differs); BIN gives the vaddr delta
+perf_samples() {
+    local out=$1 name=$2 bin=$3 full=$4
+    perf script -i "$out/perf.data" --show-mmap-events -F event,period,ip,dso 2> /dev/null | gawk -v name="$name" -v full="$full" \
+        -v delta="$(vaddr_delta "$bin")" '
+        function ours(p, b) { if (full != "") return p == full; b = p; sub(/.*\//, "", b); return b == name }
+        /PERF_RECORD_MMAP2.*r-xp/ { match($0, /\[0x[0-9a-f]+\(0x[0-9a-f]+\) @ 0x[0-9a-f]+/); split(substr($0, RSTART + 1, RLENGTH - 1), f, /[(\) @]+/)
+                                   path = $NF; m++; start[m] = strtonum(f[1]); len[m] = strtonum(substr(f[2], 1)); pgoff[m] = strtonum(f[3]); mp[m] = path; next }
+        / [0-9a-f]+ \(/ { ev = $2; sub(/:$/, "", ev); ip = strtonum("0x" $3); path = $4; gsub(/[()]/, "", path)
+                          if (ours(path)) for (i = m; i >= 1; i--) if (mp[i] == path && ip >= start[i] && ip < start[i] + len[i]) {
+                              c[ev "\t" name "\t" sprintf("%x", ip - start[i] + pgoff[i] + delta)] += $1; break } }
+        END { for (k in c) print k "\t" c[k] }' | sort -k1,1 -k3,3 > "$out/samples.tsv.new"
+    [ -s "$out/samples.tsv.new" ] || { rm -f "$out/samples.tsv.new"; fail record "no samples for $name in $out/perf.data (see $out/run.txt, ranking in $out/dsos.tsv)"; }
+    mv "$out/samples.tsv.new" "$out/samples.tsv"   # a failed pick keeps the old report
+}
+# corewait pick OUT LIB|auto: point OUT at another library of its perf.data
+pick() {
+    local out=$1 bin name; [ -s "$out/perf.data" ] || fail pick "no $out/perf.data"
+    bin=$(dso_path "$out" "${2:?usage: corewait pick OUT LIB|auto}"); name=$(basename "$bin")
+    perf_samples "$out" "$name" "$bin" "$bin"; objdump_of "$bin" "$out"
+    gawk -F'\t' -v OFS='\t' -v b="$bin" -v n="$name" -v s="$(sha256sum "$bin" | cut -d' ' -f1)" \
+        '$1 == "binary" { $2 = n } $1 == "sha256" { $2 = s } $1 == "hostbin" { $2 = b } { print }' "$out/meta.txt" > "$out/meta.tmp"; mv "$out/meta.tmp" "$out/meta.txt"
+}
+
 record_simpleperf() {
-    local dev=$1 out=$2 how=$3 target=$4 cmd=$5 name=$6 rwd=$7 bin=$8 spec ev="" st="" map="" role e p w tbl per
-    for spec in $(sample_events "$dev"); do
-        IFS="|" read -r role e p <<<"$spec"; p=$((p / ${CW_DIV:-1})); ev="$ev -e $e:u"; map="$map $e=$role"; per=$p
+    local dev=$1 out=$2 how=$3 target=$4 cmd=$5 name=$6 rwd=$7 bin=$8 spec ev="" st="" map="" role e p w tbl
+    for spec in $(sample_events "$dev"); do  # simpleperf: a -c applies to the -e after it
+        IFS="|" read -r role e p <<<"$spec"; p=$((p / ${CW_DIV:-1})); ev="$ev -c $p -e $e:u"; map="$map $e=$role=$p"
     done
-    dsh "$how" "$target" "simpleperf record -o $rwd/perf.data $ev -c $per -- $cmd" > "$out/run.txt" 2>&1 \
+    dsh "$how" "$target" "simpleperf record -o $rwd/perf.data $ev -- $cmd" > "$out/run.txt" 2>&1 \
         || fail record "simpleperf record: $(tail -3 "$out/run.txt")"
-    # the report is text with one "Event: NAME:u" section per event; EventCount = samples * period
-    dsh "$how" "$target" "simpleperf report -i $rwd/perf.data --sort dso,vaddr_in_file --print-event-count" 2> /dev/null | tr -d '\r' \
-        | gawk -v map="$map" -v name="$name" '
-        BEGIN { n = split(map, a, " "); for (i = 1; i <= n; i++) { split(a[i], kv, "="); role[kv[1]] = kv[2] } }
-        /^Event: / { e = $2; sub(/:u$/, "", e); r = role[e]; next }
-        r != "" && $3 ~ "/" name "$" && $4 ~ /^0x/ { c[r "\t" name "\t" substr($4, 3)] += $2 }
-        END { for (k in c) print k "\t" c[k] }' | sort -k1,1 -k3,3 > "$out/samples.tsv"
-    [ -s "$out/samples.tsv" ] || fail record "no samples for $name (see $out/run.txt)"
+    # the report is text with one "Event: NAME:u" section per event; -n prints samples (Android 12's simpleperf has no
+    # --print-event-count), so the count is samples * the event's period
+    dsh "$how" "$target" "simpleperf report -i $rwd/perf.data --sort dso,vaddr_in_file -n" > "$out/report.txt" 2>&1 \
+        || fail record "simpleperf report: $(grep -m1 -E ' E |rror' "$out/report.txt")"
+    tr -d '\r' < "$out/report.txt" | gawk -v map="$map" -v name="$name" '
+        BEGIN { n = split(map, a, " "); for (i = 1; i <= n; i++) { split(a[i], kv, "="); role[kv[1]] = kv[2]; per[kv[1]] = kv[3] } }
+        /^Event: / { e = $2; sub(/:u$/, "", e); r = role[e]; p = per[e]; next }
+        r != "" && $3 ~ "/" name "$" && $4 ~ /^0x/ { c[r "\t" name "\t" substr($4, 3)] += $2 * p }
+        END { for (k in c) print k "\t" c[k] }' | sort -k1,1 -k3,3 > "$out/samples.tsv.new"
+    [ -s "$out/samples.tsv.new" ] || { rm -f "$out/samples.tsv.new"; fail record "no samples for $name (see $out/run.txt)"; }
+    mv "$out/samples.tsv.new" "$out/samples.tsv"   # a failed run keeps the old samples
     read -r w tbl <<<"$(stat_events "$dev")"
     for spec in $tbl; do st="$st,${spec#*=}:u"; done
     dsh "$how" "$target" "simpleperf stat --csv -e ${st#,} -- $cmd" 2> /dev/null | tr -d '\r' > "$out/stat.raw" || fail record "simpleperf stat"
@@ -195,13 +251,13 @@ bw() {
     [ -x "$run" ] || fail bw "$run missing: corewait build $dev"
     lock "$how" "$serial"
     if [ "$how" = local ]; then mkdir -p "$wd"; go=$wd/go
-    else dsh "$how" "$target" "mkdir -p $wd"; put "$how" "$target" "$wd" "$run"; DWD=$wd; run=./cwprobe-$dev; fi
+    else dsh "$how" "$target" "mkdir -p $(printf %q "$wd")"; put "$how" "$target" "$wd" "$run"; DWD=$wd; run=./cwprobe-$dev; fi
     n=$(dsh "$how" "$target" nproc | tr -d '\r')
     for t in 1 2 4 "$n"; do
         local pre=""; [ "$t" = 1 ] && pre=$(pin_prefix "$how" "$target" "$pin")   # one thread: the core record pins to, so the two agree
-        dsh "$how" "$target" "rm -f $go"
-        out="$out ${t}t=$({ for _ in $(seq "$t"); do dsh "$how" "$target" "$pre $run stream --n $mb --go $go" & done
-                           sleep 3; dsh "$how" "$target" "touch $go"; wait; } | tr -d '\r' | gawk '{ s += $NF } END { printf "%.1f", s }')"
+        dsh "$how" "$target" "rm -f $(printf %q "$go")"
+        out="$out ${t}t=$({ for _ in $(seq "$t"); do dsh "$how" "$target" "$pre $(printf %q "$run") stream --n $mb --go $(printf %q "$go")" & done
+                           sleep 3; dsh "$how" "$target" "touch $(printf %q "$go")"; wait; } | tr -d '\r' | gawk '{ s += $NF } END { printf "%.1f", s }')"
     done
     echo "bw $dev GB/s$out"
 }
@@ -218,23 +274,33 @@ merge() {
 attached() {
     local kind how target; dev_row "$1" >/dev/null; read -r kind how target _ <<<"$(dev_row "$1")"
     case "$how" in
-        adb) adb devices | gawk -v t="$target" '$1 == t && $2 == "device" { f = 1 } END { exit !f }' ;;
-        ssh) ssh -o BatchMode=yes -o ConnectTimeout=5 "$target" true ;;
+        adb) adb devices | gawk -v t="$target" '$1 == t && $2 == "device" { f = 1 } END { exit !f }' || exit 3 ;;   # 3: configured, not reachable
+        ssh) ssh -o BatchMode=yes -o ConnectTimeout=5 "$target" true || exit 3 ;;
     esac
 }
 
 # objdump.txt is written by record; a BINARY argument regenerates a missing one
 prep() { [ -s "$1/objdump.txt" ] || { [ -f "${2:-}" ] && objdump_of "$2" "$1"; } || true; }
+# the analyzer, rebuilt when it is missing or older than its source
+an() {
+    local b="$here/build/corewait-an" s="$here/src/corewait.mojo"
+    if [ ! -x "$b" ] || [ "$s" -nt "$b" ]; then
+        mkdir -p "$here/build"
+        (cd "$here" && $GW pixi run mojo build "$s" -o "$b") > "$b.log" 2>&1 || fail build "analyzer: $(grep -m3 error "$b.log") (log $b.log)"
+    fi
+    exec "$b" "$@"
+}
 cmd=${1:-}; shift || true
 case "$cmd" in
     record) record "$@" ;;
     bw)     bw "$@" ;;
     attached) attached "$@" ;;
     merge)  merge "$@" ;;
+    pick)   pick "$@" ;;
     build)  build "$@" ;;
     stat)   read -r kind _ <<<"$(dev_row "$1")"; stat_tsv "$1" "$2" "$([ "$kind" = perf ] && echo 3 || echo 2)" ;;   # OUT/stat.tsv again from OUT/stat.raw
-    show)   prep "$1" "${2:-}"; exec "$here/build/corewait-an" show "$@" ;;
-    diff)   prep "$1" "${3:-}"; prep "${2:-}" "${4:-}"; exec "$here/build/corewait-an" diff "$@" ;;
-    budget) exec "$here/build/corewait-an" budget "$@" ;;
-    *) fail usage "corewait record|show|diff|budget|bw|build ..." ;;
+    show)   prep "$1" "${2:-}"; an show "$@" ;;
+    diff)   prep "$1" "${3:-}"; prep "${2:-}" "${4:-}"; an diff "$@" ;;
+    budget) an budget "$@" ;;
+    *) fail usage "corewait record|pick|show|diff|budget|bw|build ..." ;;
 esac

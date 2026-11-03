@@ -1,0 +1,2 @@
+stream mb 256 steps 7784628224 s 0.512533802 check 1 GBps 15.18851672538078
+simpleperf I cmd_record.cpp:760] Samples recorded: 1158. Samples lost: 0.

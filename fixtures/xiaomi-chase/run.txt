@@ -1,0 +1,3 @@
+chase mb 256 steps 4194304 s 0.50606552 check 0 Msteps/s 8.288065150141032
+simpleperf I cmd_record.cpp:864] Recorded for 0.597496 seconds. Start post processing.
+simpleperf I cmd_record.cpp:965] Samples recorded: 2,648. Samples lost: 0.

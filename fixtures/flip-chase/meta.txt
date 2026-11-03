@@ -1,5 +1,6 @@
 device	flip
 binary	cwprobe-flip
-sha256	9f6e8a2a274fe2197408848cec6202355be015093fc916fc8f80fcf4801894a7
-command	taskset 20 ./cwprobe-flip chase
-date	2026-10-21T23:20:08+02:00
+sha256	66777254c26c4ad8c229f62a5e8851ff659c78aec0dd788e08ae0396458da1fa
+command	taskset 40 ./cwprobe-flip chase
+hostbin	build/cwprobe-flip
+date	2026-10-30T00:54:53+01:00

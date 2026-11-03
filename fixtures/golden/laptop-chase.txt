@@ -4,5 +4,5 @@ fn  13.2%  cwprobe::fill_k
     addr   cyc%       cycles         mem        fe        br  cause  instruction
     1340  86.8%    467000000     4180000         0         0  mem    mov rax, qword ptr [rdi + 8*rax]
     14fa   7.1%     38000000           0   6000000         0  dep    inc rdx
-    14f3   5.6%     30000000           0  61000000         0  fe     and r9, rax
+    14f3   5.6%     30000000           0  61000000         0  dep    and r9, rax
     1500   0.6%      3000000           0         0         0  dep    cmp rsi, rdx

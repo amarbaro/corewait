@@ -1,0 +1,6 @@
+0000000000001000 <k>:
+    1000:      	imul	rax, rbx
+    1004:      	add	rax, rcx
+    1008:      	inc	rax
+    100c:      	nop
+    1010:      	ret

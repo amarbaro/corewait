@@ -1,5 +1,6 @@
 device	xiaomi
 binary	cwprobe-xiaomi
-sha256	ec07230235af2a28bdadf1dd5db908dafef5928186b441bb590366de0ef2b541
+sha256	e760721708187d41b4e32fc7c1f6063ec748e8bb0b88f21428004d51818ca680
 command	./cwprobe-xiaomi fmachain
-date	2026-10-21T23:07:44+02:00
+hostbin	build/cwprobe-xiaomi
+date	2026-10-30T00:56:40+01:00

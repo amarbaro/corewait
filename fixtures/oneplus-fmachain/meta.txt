@@ -1,0 +1,6 @@
+device	oneplus
+binary	cwprobe-oneplus
+sha256	29a6465ab6d615c457e619338cdec9a3974dcf79a0e96c56617d11c475393833
+command	./cwprobe-oneplus fmachain
+hostbin	build/cwprobe-oneplus
+date	2026-10-30T00:33:49+01:00

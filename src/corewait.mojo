@@ -4,11 +4,15 @@
 #   row go to the nearest preceding load (branch) in the same function; --k 0 turns the rule off.
 #   causes, first match wins: mem (memory event charged), branch, dep (the row, or the one before it, reads a register one of
 #   the 3 rows before it wrote), fe (front-end event), busy (the rest).
-from std.os import stat
+from std.collections import Dict
+from std.os import getenv, stat
+from std.os.path import exists
 from std.sys import argv, exit
 
 comptime NC = 5
 comptime MIN_SAMPLES = 10  # fewer samples of an event on a row are noise: no cause, no skid
+comptime ROW_CAP = 4096  # an instruction line is kept to its first bytes: a branch row names its target's whole mangled symbol (1.4 MB each)
+comptime ALIGN_CELLS = 40000000  # diff: a function pair above this many cells is aligned in linear memory (CW_ALIGN_CELLS overrides)
 
 
 def fail(step: String, reason: String):
@@ -39,10 +43,18 @@ def hexs(a: Int) -> String:
             return s
 
 
+def hex_digit(c: UInt8) -> Int:
+    """0-15, either case; -1 for any other byte."""
+    if c >= 48 and c < 58:
+        return Int(c - 48)
+    var l = c | 32
+    return Int(l - 87) if l >= 97 and l < 103 else -1
+
+
 def hex_val(s: String) -> Int:
     var v = 0
     for c in s.as_bytes():
-        v = v * 16 + Int(c - 48 if c < 58 else c - 87)
+        v = v * 16 + hex_digit(c)
     return v
 
 
@@ -76,7 +88,23 @@ def is_branch(mn: String) -> Bool:
 
 
 def writes_nothing(mn: String) -> Bool:
-    return mn.startswith("cmp") or mn.startswith("test") or mn.startswith("tst") or mn.startswith("fcmp") or mn.startswith("ucomis") or mn.startswith("vucomis") or mn.startswith("st") or mn.startswith("nop") or mn.startswith("push") or mn.startswith("prf")
+    return mn.startswith("cmp") or mn.startswith("cmn") or mn.startswith("ccm") or mn.startswith("fccm") or mn.startswith("test") or mn.startswith("tst") or mn.startswith("fcmp") or mn.startswith("ucomis") or mn.startswith("vucomis") or mn.startswith("st") or mn.startswith("nop") or mn.startswith("push") or mn.startswith("prf")
+
+
+def rmw(mn: String, dest: String, ops: String) -> Bool:
+    """x86 two-operand forms read their destination (add rax, rcx; inc rax; vfmadd231): AArch64 and VEX three-operand forms do not."""
+    var x86 = dest.startswith("r") or dest.startswith("e") or dest.startswith("xmm") or dest.startswith("ymm") or dest.startswith("zmm")
+    for g in ["al", "ah", "bl", "bh", "cl", "ch", "dl", "dh", "ax", "bx", "cx", "dx", "si", "di", "bp", "sil", "dil", "bpl"]:
+        x86 = x86 or dest == g
+    if not x86:
+        return False
+    if mn.startswith("v"):
+        return mn.startswith("vfm") or mn.startswith("vfnm") or mn.startswith("vperm") and (mn.find("2") >= 0)
+    var writes = mn.startswith("mov") or mn.startswith("lea") or mn.startswith("set") or mn.startswith("cvt") or mn.startswith("pop") or mn.startswith("lzcnt") or mn.startswith("tzcnt") or mn.startswith("popcnt") or mn.startswith("bs") or mn.startswith("pshuf") or mn.startswith("sqrt") or mn.startswith("rdtsc") or mn.startswith("cpuid")
+    var n = 1
+    for c in ops.as_bytes():
+        n += 1 if c == 44 else 0
+    return not writes and not (mn == "imul" and n == 3)
 
 
 def operand0(rest: String) -> String:
@@ -140,10 +168,53 @@ struct Analysis(Movable):
         return -1
 
 
+struct Lines:
+    """The lines of a file read in 8 MB chunks, so a 1 GB objdump never sits in memory. An instruction line (it starts
+    with a space) is cut to ROW_CAP bytes; a function header line comes whole."""
+
+    var f: FileHandle
+    var buf: List[UInt8]
+    var pos: Int
+    var scan: Int
+    var eof: Bool
+
+    def __init__(out self, path: String) raises:
+        self.f = open(path, "r")
+        self.buf = List[UInt8]()
+        self.pos = 0
+        self.scan = 0
+        self.eof = False
+
+    def next(mut self, mut line: String) raises -> Bool:
+        while True:
+            while self.scan < len(self.buf) and self.buf[self.scan] != 10:
+                self.scan += 1
+            if self.scan < len(self.buf) or self.eof:
+                break
+            self.buf = List[UInt8](Span(self.buf)[self.pos : len(self.buf)])  # drop what was consumed, then append a chunk
+            self.scan -= self.pos
+            self.pos = 0
+            var chunk = self.f.read_bytes(8 << 20)
+            if len(chunk) == 0:
+                self.eof = True
+            else:
+                self.buf.extend(chunk^)
+        if self.pos >= len(self.buf):
+            return False
+        var end = self.scan
+        if self.buf[self.pos] == 32 and end - self.pos > ROW_CAP:
+            end = self.pos + ROW_CAP
+        line = String(unsafe_from_utf8=Span(self.buf)[self.pos : end])
+        self.pos = self.scan + 1
+        self.scan = self.pos
+        return True
+
+
 def load_insns(mut an: Analysis, path: String) raises:
     var writer = List[String]()  # destination register of each row, "" if none
-    var srcs = List[List[String]]()
-    for line in open(path, "r").read().split("\n"):
+    var rd = Lines(path)
+    var line = String("")
+    while rd.next(line):
         if line.byte_length() == 0:
             continue
         if not line.startswith(" "):  # "0000000000001360 <name>:"
@@ -164,20 +235,26 @@ def load_insns(mut an: Analysis, path: String) raises:
         var ops = String(rest[byte=0:cm]) if cm >= 0 else rest
         var first = operand0(ops).strip()
         var br = is_branch(mn)
-        var store = first.find("ptr [") >= 0 and (mn.startswith("mov") or mn.startswith("vmov") or mn.startswith("vpmov"))
+        var store = first.find("ptr [") >= 0 and (mn.startswith("mov") or mn.startswith("vmov") or mn.startswith("vpmov") or mn.find("extr") >= 0 or mn.startswith("set") or mn.find("cvtps2ph") >= 0 or mn.find("maskmov") >= 0 or mn.find("compress") >= 0 or mn.find("scatter") >= 0)
         var ld = (mn.startswith("ld") or (ops.find("ptr [") >= 0 and not store)) and not br
         var dest = String("")
         if not writes_nothing(mn) and not br and first.byte_length() > 0 and first.find("[") < 0:
             var c0 = first.as_bytes()[0]
-            if c0 != 35 and not (c0 >= 48 and c0 <= 57):
-                dest = String(first)
-        var src = tokens(String(rest[byte = max(0, first.byte_length() + 1) :]) if rest.byte_length() > first.byte_length() else String(""))
-        var d = False
-        if dest.byte_length() > 0 and not ld:
+            var ft = tokens(String(first))  # "v0.4s" and "{v0.4s": the register is the first token
+            if c0 != 35 and not (c0 >= 48 and c0 <= 57) and len(ft) > 0:
+                dest = ft[0]
+        var src = List[String]()  # a branch row reads no dependence: its operand text (a mangled symbol) is not tokenised
+        if not br:
+            src = tokens(String(rest[byte = max(0, first.byte_length() + 1) :]) if rest.byte_length() > first.byte_length() else String(""))
+        var zero = dest.byte_length() > 0 and len(src) > 0 and (mn == "xor" or mn == "sub" or mn.endswith("pxor") or mn.endswith("xorps") or mn.endswith("xorpd"))
+        for t in src:  # "xor eax, eax": a zero idiom, renamed away, reads nothing
+            zero = zero and t == dest
+        var d = rmw(mn, dest, ops) and not ld and not zero
+        if dest.byte_length() > 0 and not ld and not zero:
             for t in src:
                 d = d or t == dest
         var n = len(an.ins)
-        if not ld and not br:
+        if not ld and not br and not zero:
             for j in range(max(0, n - 3), n):
                 if an.ins[j].func == len(an.fns) - 1 and writer[j].byte_length() > 0:
                     for t in src:
@@ -213,22 +290,38 @@ def load_samples(mut an: Analysis, path: String) raises:
     var n = len(b)
     var i = 0
     var last = -1
+    var lineno = 0
     while i < n:
+        lineno += 1
+        if b[i] == 10 or b[i] == 13:  # a blank line; the CR of a CRLF one is not a line
+            lineno -= 1 if b[i] == 13 else 0
+            i += 1
+            continue
         var ev = b[i]
-        while i < n and b[i] != 9:
+        for _ in range(2):  # event, dso
+            while i < n and b[i] != 9 and b[i] != 10:
+                i += 1
+            if i >= n or b[i] == 10:
+                fail("samples", "too few fields at " + path + " line " + String(lineno))
             i += 1
-        i += 1
-        while i < n and b[i] != 9:  # dso
-            i += 1
-        i += 1
         var addr = 0
+        if i + 1 < n and b[i] == 48 and b[i + 1] | 32 == 120:  # 0x
+            i += 2
         while i < n and b[i] != 9:
-            addr = addr * 16 + Int(b[i] - 48 if b[i] < 58 else b[i] - 87)
+            if b[i] == 10:
+                fail("samples", "too few fields at " + path + " line " + String(lineno))
+            var d = hex_digit(b[i])
+            if d < 0:
+                fail("samples", "bad address at " + path + " line " + String(lineno))
+            addr = addr * 16 + d
             i += 1
         i += 1
         var count = 0
         while i < n and b[i] != 10:
-            count = count * 10 + Int(b[i] - 48)
+            if b[i] != 13:
+                if b[i] < 48 or b[i] > 57:
+                    fail("samples", "bad count at " + path + " line " + String(lineno))
+                count = count * 10 + Int(b[i] - 48)
             i += 1
         i += 1
         var r = last if last >= 0 and an.ins[last].addr == addr else find_row(an.ins, addr)
@@ -335,6 +428,9 @@ def load_stat(mut an: Analysis, path: String) raises:
 
 
 def analyze(od: String, k: Int) raises -> Analysis:
+    for f in ["objdump.txt", "samples.tsv", "stat.tsv"]:
+        if not exists(od + "/" + f):
+            fail("input", "no " + f + " in " + od + ": not a corewait recording (corewait record DEV OUT -- BINARY)")
     var an = Analysis()
     an.k = k
     load_insns(an, od + "/objdump.txt")
@@ -445,7 +541,53 @@ def key(text: String) -> String:
     return String(t[byte=0:cut]) if cut >= 0 else t
 
 
+def is_reg(t: String) -> Bool:
+    """x86 and ARM register names: rax..r15 with d/w/b, e/l/h forms, xmm/ymm/zmm/k, x/w/v/q/d/s/h/b with a number, sp, xzr."""
+    var b = t.as_bytes()
+    var n = len(b)
+    if n < 2 or n > 6:
+        return False
+    for w in ["sp", "xzr", "wzr", "rsp", "rbp", "rsi", "rdi", "esp", "ebp", "esi", "edi", "sil", "dil", "spl", "bpl", "rip"]:
+        if t == w:
+            return True
+    if n == 3 and (b[0] == 114 or b[0] == 101) and b[2] == 120:  # rax ebx ...
+        return b[1] >= 97 and b[1] <= 100
+    if n == 2 and b[1] == 120 and b[0] >= 97 and b[0] <= 100:  # ax bx cx dx
+        return True
+    if n == 2 and (b[1] == 108 or b[1] == 104) and b[0] >= 97 and b[0] <= 100:  # al ah ...
+        return True
+    var i = 0
+    if t.startswith("xmm") or t.startswith("ymm") or t.startswith("zmm"):
+        i = 3
+    elif b[0] == 114 or b[0] == 120 or b[0] == 119 or b[0] == 118 or b[0] == 113 or b[0] == 100 or b[0] == 115 or b[0] == 104 or b[0] == 107 or b[0] == 98:
+        i = 1  # r8.. x0 w0 v0 q0 d0 s0 h0 k0 b0
+    else:
+        return False
+    var d = i
+    while d < n and b[d] >= 48 and b[d] <= 57:
+        d += 1
+    if d == i:
+        return False
+    return d == n or (b[0] == 114 and i == 1 and d == n - 1 and (b[d] == 100 or b[d] == 119 or b[d] == 98))
+
+
+def shape(k: String) -> String:
+    """A key with its register names cut to %: one instruction with other registers, as two builds allocate them."""
+    var out = String("")
+    var cur = String("")
+    for c in k.as_bytes():
+        if (c >= 48 and c <= 57) or (c >= 97 and c <= 122) or c == 95:
+            cur += String(chr(Int(c)))
+            continue
+        out += "%" if is_reg(cur) else cur
+        cur = String("")
+        out += String(chr(Int(c)))
+    return out + ("%" if is_reg(cur) else cur)
+
+
 def spct(a: Int, b: Int) -> String:
+    if a == 0:
+        return "new" if b > 0 else "+0.0%"
     return ("+" if b >= a else "-") + pct(abs(b - a), a)
 
 
@@ -457,7 +599,108 @@ def fn_rows(an: Analysis, name: String) -> List[Int]:
     return rows^
 
 
-def diff(a: Analysis, b: Analysis, top: Int):
+def lcs_row(a: List[Int], alo: Int, ahi: Int, b: List[Int], blo: Int, bhi: Int, rev: Bool) -> List[Int32]:
+    """LCS lengths of a[alo:ahi] against every prefix of b[blo:bhi] (every suffix of it when `rev`): m + 1 values."""
+    var m = bhi - blo
+    var row = List[Int32](length=m + 1, fill=0)
+    for ii in range(ahi - alo):
+        var x = a[alo + ii] if not rev else a[ahi - 1 - ii]
+        var diag = Int32(0)
+        for j in range(1, m + 1):
+            var up = row[j]
+            var y = b[blo + j - 1] if not rev else b[bhi - j]
+            if x == y:
+                row[j] = diag + 1
+            elif row[j - 1] > up:
+                row[j] = row[j - 1]
+            diag = up
+    return row^
+
+
+def hirschberg(a: List[Int], alo: Int, ahi: Int, b: List[Int], blo: Int, bhi: Int, mut out: List[Int]):
+    """Append the aligned pairs of a[alo:ahi] and b[blo:bhi] (the layout of align()): memory linear in the rows."""
+    if ahi == alo:
+        for j in range(blo, bhi):
+            out += [-1, j]
+        return
+    if bhi == blo:
+        for i in range(alo, ahi):
+            out += [i, -1]
+        return
+    if ahi - alo == 1:
+        var hit = -1
+        for j in range(blo, bhi):
+            if b[j] == a[alo]:
+                hit = j
+                break
+        if hit < 0:
+            out += [alo, -1]
+        for j in range(blo, bhi):
+            if j == hit:
+                out += [alo, j]
+            else:
+                out += [-1, j]
+        return
+    var mid = (alo + ahi) // 2
+    var f = lcs_row(a, alo, mid, b, blo, bhi, False)
+    var g = lcs_row(a, mid, ahi, b, blo, bhi, True)
+    var m = bhi - blo
+    var best = -1
+    var cut = 0
+    for k in range(m + 1):
+        var v = Int(f[k]) + Int(g[m - k])
+        if v > best:
+            best = v
+            cut = k
+    hirschberg(a, alo, mid, b, blo, blo + cut, out)
+    hirschberg(a, mid, ahi, b, blo + cut, bhi, out)
+
+
+def align(ka: List[String], kb: List[String]) raises -> List[Int]:
+    """Align two key sequences by LCS. Two entries per pair: the index in A and in B (-1: no partner, the row is removed
+    or inserted). Up to ALIGN_CELLS cells the O(nm) table whose tie-breaking the golden diffs froze; above it Hirschberg's
+    recursion, the same LCS length in memory linear in the rows."""
+    var ids = Dict[String, Int]()
+    var a = List[Int]()
+    var b = List[Int]()
+    for t in ka:
+        if t not in ids:
+            ids[t] = len(ids)
+        a.append(ids[t])
+    for t in kb:
+        if t not in ids:
+            ids[t] = len(ids)
+        b.append(ids[t])
+    var n = len(a)
+    var m = len(b)
+    var out = List[Int]()
+    if n * m > atol(getenv("CW_ALIGN_CELLS", String(ALIGN_CELLS)), 10) or n > 65000 or m > 65000:
+        hirschberg(a, 0, n, b, 0, m, out)
+        return out^
+    var L = List[UInt16](length=(n + 1) * (m + 1), fill=0)
+    for i in range(n - 1, -1, -1):
+        for j in range(m - 1, -1, -1):
+            if a[i] == b[j]:
+                L[i * (m + 1) + j] = L[(i + 1) * (m + 1) + j + 1] + 1
+            else:
+                L[i * (m + 1) + j] = max(L[(i + 1) * (m + 1) + j], L[i * (m + 1) + j + 1])
+    var i = 0
+    var j = 0
+    while i < n or j < m:
+        if i < n and j < m and a[i] == b[j]:
+            out += [i, j]
+            i += 1
+            j += 1
+        elif j >= m or (i < n and L[(i + 1) * (m + 1) + j] >= L[i * (m + 1) + j + 1]):
+            out += [i, -1]
+            i += 1
+        else:
+            out += [-1, j]
+            j += 1
+    return out^
+
+
+def diff(a: Analysis, b: Analysis, top: Int) raises:
     """Per-row cycle delta between two runs: rows of same-named functions are aligned by LCS on the instruction text."""
     var d_row = List[Int]()  # row of A (or -1), row of B (or -1), cycle delta, three values per entry
     var ta = 0
@@ -477,30 +720,22 @@ def diff(a: Analysis, b: Analysis, top: Int):
         for fb in range(len(b.fns)):
             if b.fns[fb] == a.fns[fa]:
                 rb = fn_rows(b, b.fns[fb])
-        var n = len(ra)
-        var m = len(rb)
-        if n * m > 40000000 or n > 65000 or m > 65000:
-            fail("diff", a.fns[fa] + " has " + String(n) + " and " + String(m) + " rows: too large to align")
-        var L = List[UInt16](length=(n + 1) * (m + 1), fill=0)
-        for i in range(n - 1, -1, -1):
-            for j in range(m - 1, -1, -1):
-                if key(a.ins[ra[i]].text) == key(b.ins[rb[j]].text):
-                    L[i * (m + 1) + j] = L[(i + 1) * (m + 1) + j + 1] + 1
-                else:
-                    L[i * (m + 1) + j] = max(L[(i + 1) * (m + 1) + j], L[i * (m + 1) + j + 1])
-        var i = 0
-        var j = 0
-        while i < n or j < m:
-            if i < n and j < m and key(a.ins[ra[i]].text) == key(b.ins[rb[j]].text):
-                d_row += [ra[i], rb[j], b.ins[rb[j]].cyc - a.ins[ra[i]].cyc]
-                i += 1
-                j += 1
-            elif j >= m or (i < n and L[(i + 1) * (m + 1) + j] >= L[i * (m + 1) + j + 1]):
-                d_row += [ra[i], -1, -a.ins[ra[i]].cyc]
-                i += 1
+        var ka = List[String]()
+        var kb = List[String]()
+        for r in ra:
+            ka.append(shape(key(a.ins[r].text)))
+        for r in rb:
+            kb.append(shape(key(b.ins[r].text)))
+        var al = align(ka, kb)
+        for e in range(0, len(al), 2):
+            var x = al[e]
+            var y = al[e + 1]
+            if x >= 0 and y >= 0:
+                d_row += [ra[x], rb[y], b.ins[rb[y]].cyc - a.ins[ra[x]].cyc]
+            elif x >= 0:
+                d_row += [ra[x], -1, -a.ins[ra[x]].cyc]
             else:
-                d_row += [-1, rb[j], b.ins[rb[j]].cyc]
-                j += 1
+                d_row += [-1, rb[y], b.ins[rb[y]].cyc]
     for fb in range(len(b.fns)):  # functions only B has
         var found = False
         for fa in range(len(a.fns)):
@@ -526,18 +761,35 @@ def diff(a: Analysis, b: Analysis, top: Int):
 
 
 def tenths(s: String) raises -> Int:
-    """\"12\" -> 120, \"12.5\" -> 125."""
+    """\"12\" -> 120, \"12.5\" -> 125; -1 for anything else."""
     var parts = s.split(".")
+    if len(parts) > 2 or not is_digits(String(parts[0])) or (len(parts) == 2 and not is_digits(String(parts[1]))):
+        return -1
     return Int(String(parts[0])) * 10 + (Int(String(String(parts[1])[byte=0:1])) if len(parts) > 1 else 0)
+
+
+def is_digits(s: String) -> Bool:
+    if s.byte_length() == 0:
+        return False
+    for c in s.as_bytes():
+        if c < 48 or c > 57:
+            return False
+    return True
 
 
 def budget(an: Analysis, path: String) raises:
     """FILE lines `fn cause max-percent`: the cause may take at most that share of the function's cycles. Exit 1 on a breach."""
     var breaches = 0
+    var rules = 0
+    var lineno = 0
     for line in open(path, "r").read().split("\n"):
+        lineno += 1
         var f = line.split()
-        if len(f) < 3 or f[0].startswith("#"):
+        if len(f) == 0 or f[0].startswith("#"):
             continue
+        if len(f) < 3:
+            fail("budget", "want 'fn cause max-percent' at " + path + ":" + String(lineno))
+        rules += 1
         var c = -1
         for q in range(NC):
             if cname(q) == f[1]:
@@ -547,13 +799,18 @@ def budget(an: Analysis, path: String) raises:
         var cc = cause_cycles(an, select(an, String(f[0])))
         if cc[NC] == 0:
             fail("budget", "no samples in functions matching '" + String(f[0]) + "'")
+        var cap = tenths(String(f[2]))
+        if cap < 0:
+            fail("budget", "bad percent '" + String(f[2]) + "' at " + path + ":" + String(lineno))
         var got = (cc[c] * 1000 + cc[NC] // 2) // cc[NC]
         var line_out = String(f[0]) + " " + String(f[1]) + " " + pct(cc[c], cc[NC]) + " (max " + String(f[2]) + "%)"
-        if got > tenths(String(f[2])):
+        if got > cap:
             breaches += 1
             print("FAIL budget: " + line_out)
         else:
             print("ok " + line_out)
+    if rules == 0:
+        fail("budget", "no rules in " + path)
     if breaches > 0:
         exit(1)
 
@@ -570,18 +827,28 @@ def main() raises:
     var i = 2
     while i < len(args):
         if args[i] == "--top":
+            if i + 1 >= len(args):
+                fail("usage", "--top needs a value")
             top = Int(String(args[i + 1]))
             i += 1
         elif args[i] == "--k":
+            if i + 1 >= len(args):
+                fail("usage", "--k needs a value")
             k = Int(String(args[i + 1]))
             i += 1
         elif args[i] == "--fn":
+            if i + 1 >= len(args):
+                fail("usage", "--fn needs a value")
             func = String(args[i + 1])
             i += 1
         elif args[i] == "--bytes":
+            if i + 1 >= len(args):
+                fail("usage", "--bytes needs a value")
             bytes_ = Int(String(args[i + 1]))
             i += 1
         elif args[i] == "--bw":
+            if i + 1 >= len(args):
+                fail("usage", "--bw needs a value")
             bw = Float64(String(args[i + 1]))
             i += 1
         elif args[i] == "--causes":

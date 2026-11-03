@@ -1,3 +1,3 @@
-branchy mb 1 steps 136970240 s 0.500327761 check 1 Msteps/s 273.76102362627046
-simpleperf I cmd_record.cpp:840] Recorded for 0.527657 seconds. Start post processing.
-simpleperf I cmd_record.cpp:941] Samples recorded: 1,776. Samples lost: 0.
+branchy mb 1 steps 135266304 s 0.500249323 check 0 Msteps/s 270.3977752309722
+simpleperf I cmd_record.cpp:840] Recorded for 0.53104 seconds. Start post processing.
+simpleperf I cmd_record.cpp:941] Samples recorded: 8,269. Samples lost: 0.

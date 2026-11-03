@@ -1,0 +1,6 @@
+0000000000001000 <z_k>:
+    1000:      	xor	eax, eax
+    1002:      	nop
+    1003:      	vpxor	xmm1, xmm1, xmm1
+    1007:      	nop
+    1008:      	ret

@@ -1,16 +1,17 @@
-run: cycles 1515136805 ipc 0.65 | frontend 0.2% backend 79.8% backend-mem 0.6% retiring 20.0% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
-fn  93.2%  cwprobe::stream_k
-fn   6.8%  cwprobe::fill_k
+run: cycles 1559823074 ipc 0.57 | frontend 0.2% backend 82.2% backend-mem 0.1% retiring 17.6% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+fn  93.0%  cwprobe::stream_k
+fn   6.9%  cwprobe::fill_k
+fn   0.1%  main
     addr   cyc%       cycles         mem        fe        br  cause  instruction
-    80ec  28.3%    421000000    59000000         0         0  mem    ldp q25, q24, [x8, #0x20]
-    80c4  20.3%    302000000    48000000         0         0  mem    ldp q26, q27, [x8, #-0x80]
-    810c  19.2%    286000000    46000000         0         0  mem    ldp q26, q27, [x8, #0x40]
-    80d4  18.3%    272000000    44000000         0         0  mem    ldp q27, q26, [x8, #-0x20]
-    82c0   5.4%     80000000           0         0         0  dep    eor x8, x8, x8, lsl #13
-    80e0   1.5%     22000000     2000000   1000000         0  busy   add v18.2d, v25.2d, v18.2d
-    80c8   1.1%     17000000     4000000         0         0  busy   add v0.2d, v27.2d, v0.2d
-    82d4   0.7%     11000000           0         0         0  busy   b.ne 0x82c0 <cwprobe::fill_k(::Pointer[True, MutUntrackedOri
-    80fc   0.6%      9000000     5000000         0         0  busy   add v7.2d, v27.2d, v7.2d
-    80dc   0.4%      6000000     1000000         0         0  busy   ldp q24, q25, [x8, #-0x40]
-    80f8   0.4%      6000000           0         0         0  busy   ldp q26, q27, [x8]
-    8110   0.4%      6000000     1000000         0         0  busy   add v3.2d, v27.2d, v3.2d
+    80a4  24.9%    364000000    55000000         0         0  mem    ldp q26, q27, [x8, #-0x80]
+    80cc  23.1%    338000000    39000000         0         0  mem    ldp q25, q24, [x8, #0x20]
+    80b4  19.2%    281000000    31000000         0         0  mem    ldp q27, q26, [x8, #-0x20]
+    80ec  19.2%    281000000    34000000         0         0  mem    ldp q26, q27, [x8, #0x40]
+    82a0   5.4%     79000000           0         0         0  dep    eor x8, x8, x8, lsl #13
+    80dc   1.2%     17000000           0         0         0  dep    add v7.2d, v27.2d, v7.2d
+    80f0   1.2%     17000000     2000000         0         0  dep    add v3.2d, v27.2d, v3.2d
+    82b4   1.1%     16000000           0         0         0  busy   b.ne 0x82a0 <cwprobe::fill_k(::Pointer[True, `0 MutUntracked
+    80c0   1.0%     14000000     3000000         0         0  dep    add v18.2d, v25.2d, v18.2d
+    80a8   0.8%     11000000     5000000         0         0  dep    add v0.2d, v27.2d, v0.2d
+    80e8   0.5%      8000000           0         0         0  busy   ldp q25, q24, [x8, #0x60]
+    810c   0.3%      5000000     1000000         0         0  dep    cmp x10, x1

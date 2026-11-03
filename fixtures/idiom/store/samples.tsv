@@ -1,0 +1,5 @@
+cycles	x	1010	5000000
+cycles	x	1014	3000000
+cycles	x	101c	2000000
+mem	x	1000	1
+mem	x	101c	200

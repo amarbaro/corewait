@@ -1,72 +1,1452 @@
-00000000000081d0 <cwprobe::up(::SIMD[DType.uint64, 1])>:
-    81d0:      	add	x8, x0, x0, lsl #1
-    81d4:      	add	x0, x8, #0x1
-    81d8:      	ret
-    81dc:      	nop
+00000000000081b0 <cwprobe::up(::SIMD[DType.uint64, 1])>:
+    81b0:      	add	x8, x0, x0, lsl #1
+    81b4:      	add	x0, x8, #0x1
+    81b8:      	ret
+    81bc:      	nop
 
-00000000000081e0 <cwprobe::down(::SIMD[DType.uint64, 1])>:
-    81e0:      	eor	x0, x0, x0, lsr #3
-    81e4:      	ret
-    81e8:      	nop
-    81ec:      	nop
+00000000000081c0 <cwprobe::down(::SIMD[DType.uint64, 1])>:
+    81c0:      	eor	x0, x0, x0, lsr #3
+    81c4:      	ret
+    81c8:      	nop
+    81cc:      	nop
 
-00000000000081f0 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])>:
-    81f0:      	cmp	x1, #0x1
-    81f4:      	b.lt	0x8244 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x54>
-    81f8:      	str	x30, [sp, #-0x20]!
-    81fc:      	stp	x20, x19, [sp, #0x10]
-    8200:      	mov	x19, x0
-    8204:      	bic	x20, x1, x1, asr #63
-    8208:      	b	0x8220 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x30>
-    820c:      	mov	x0, x2
-    8210:      	bl	0x81e0 <cwprobe::down(::SIMD[DType.uint64, 1])>
-    8214:      	mov	x2, x0
-    8218:      	subs	x20, x20, #0x1
-    821c:      	b.eq	0x823c <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x4c>
-    8220:      	ldrb	w8, [x19], #0x8
-    8224:      	tbz	w8, #0x0, 0x820c <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x1c>
-    8228:      	mov	x0, x2
-    822c:      	bl	0x81d0 <cwprobe::up(::SIMD[DType.uint64, 1])>
-    8230:      	mov	x2, x0
-    8234:      	subs	x20, x20, #0x1
-    8238:      	b.ne	0x8220 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x30>
-    823c:      	ldp	x20, x19, [sp, #0x10]
-    8240:      	ldr	x30, [sp], #0x20
-    8244:      	mov	x0, x2
-    8248:      	ret
-    824c:      	nop
+00000000000081d0 <cwprobe::branchy_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])>:
+    81d0:      	cmp	x1, #0x1
+    81d4:      	b.lt	0x8224 <cwprobe::branchy_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x54>
+    81d8:      	str	x30, [sp, #-0x20]!
+    81dc:      	stp	x20, x19, [sp, #0x10]
+    81e0:      	mov	x19, x1
+    81e4:      	mov	x20, x0
+    81e8:      	b	0x8200 <cwprobe::branchy_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x30>
+    81ec:      	mov	x0, x2
+    81f0:      	bl	0x81c0 <cwprobe::down(::SIMD[DType.uint64, 1])>
+    81f4:      	mov	x2, x0
+    81f8:      	subs	x19, x19, #0x1
+    81fc:      	b.eq	0x821c <cwprobe::branchy_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x4c>
+    8200:      	ldrb	w8, [x20], #0x8
+    8204:      	tbz	w8, #0x0, 0x81ec <cwprobe::branchy_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x1c>
+    8208:      	mov	x0, x2
+    820c:      	bl	0x81b0 <cwprobe::up(::SIMD[DType.uint64, 1])>
+    8210:      	mov	x2, x0
+    8214:      	subs	x19, x19, #0x1
+    8218:      	b.ne	0x8200 <cwprobe::branchy_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])+0x30>
+    821c:      	ldp	x20, x19, [sp, #0x10]
+    8220:      	ldr	x30, [sp], #0x20
+    8224:      	mov	x0, x2
+    8228:      	ret
+    822c:      	nop
 
-0000000000008250 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)>:
-    8250:      	subs	x8, x1, #0x1
-    8254:      	b.lt	0x82c0 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x70>
-    8258:      	tbz	w2, #0x0, 0x8298 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x48>
-    825c:      	mov	x9, #0x814f             // =33103
-    8260:      	movk	x9, #0xf767, lsl #16
-    8264:      	movk	x9, #0x7b7e, lsl #32
-    8268:      	movk	x9, #0x1405, lsl #48
-    826c:      	mov	x10, #0x7f2d            // =32557
-    8270:      	movk	x10, #0x4c95, lsl #16
-    8274:      	movk	x10, #0xf42d, lsl #32
-    8278:      	movk	x10, #0x5851, lsl #48
-    827c:      	nop
-    8280:      	and	x11, x9, x8
-    8284:      	str	x11, [x0], #0x8
-    8288:      	add	x9, x9, x10
-    828c:      	subs	x1, x1, #0x1
-    8290:      	b.ne	0x8280 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x30>
-    8294:      	b	0x82c0 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x70>
-    8298:      	mov	x8, #0x7a44             // =31300
-    829c:      	movk	x8, #0xcbbf, lsl #16
-    82a0:      	movk	x8, #0x408d, lsl #32
-    82a4:      	movk	x8, #0x139, lsl #48
-    82a8:      	eor	x8, x8, x8, lsl #13
-    82ac:      	eor	x8, x8, x8, lsr #7
-    82b0:      	eor	x8, x8, x8, lsl #17
-    82b4:      	str	x8, [x0], #0x8
-    82b8:      	subs	x1, x1, #0x1
-    82bc:      	b.ne	0x82a8 <cwprobe::fill_k(::Pointer[True, MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, MutUntrackedOrigin](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)+0x58>
-    82c0:      	ret
-    82c4:      	nop
-    82c8:      	nop
-    82cc:      	nop
+0000000000008680 <main>:
+    8680:      	stp	x29, x30, [sp, #-0x60]!
+    8684:      	stp	x28, x27, [sp, #0x10]
+    8688:      	stp	x26, x25, [sp, #0x20]
+    868c:      	stp	x24, x23, [sp, #0x30]
+    8690:      	stp	x22, x21, [sp, #0x40]
+    8694:      	stp	x20, x19, [sp, #0x50]
+    8698:      	sub	sp, sp, #0x1, lsl #12   // =0x1000
+    869c:      	sub	sp, sp, #0x110
+    86a0:      	mov	x19, x1
+    86a4:      	mov	w20, w0
+    86a8:      	bl	0xd404 <KGEN_CompilerRT_AsyncRT_GetCurrentCPUDevice>
+    86ac:      	cbnz	x0, 0x86d0 <main+0x50>
+    86b0:      	adrp	x0, 0x0 <write>
+    86b4:      	add	x0, x0, #0xc80
+    86b8:      	nop
+    86bc:      	adr	x2, 0xc624 <std::builtin::_startup::_init_global_runtime()>
+    86c0:      	nop
+    86c4:      	adr	x3, 0xc628 <std::builtin::_startup::_destroy_global_runtime(::Optional[::Pointer[True, `0 MutUntrackedOrigin, ::NoneType, ::Origin[True, `0](), AddressSpace.GENERIC]])>
+    86c8:      	mov	w1, #0x7                // =7
+    86cc:      	bl	0xd274 <KGEN_CompilerRT_GetOrCreateGlobal>
+    86d0:      	mov	w0, w20
+    86d4:      	mov	x1, x19
+    86d8:      	bl	0xd414 <KGEN_CompilerRT_SetArgV>
+    86dc:      	bl	0xd448 <KGEN_CompilerRT_PrintStackTraceOnFault>
+    86e0:      	bl	0xd4d0 <cw_argc>
+    86e4:      	mov	x19, x0
+    86e8:      	cmp	x0, #0x2
+    86ec:      	b.lt	0x87b0 <main+0x130>
+    86f0:      	mov	w20, #0x1               // =1
+    86f4:      	mov	w0, #0x1                // =1
+    86f8:      	bl	0xd4dc <cw_arg_len>
+    86fc:      	mov	x21, x0
+    8700:      	cmp	x0, #0x1
+    8704:      	b.lt	0x87d0 <main+0x150>
+    8708:      	mov	w0, #0x1                // =1
+    870c:      	mov	x1, xzr
+    8710:      	mov	x2, xzr
+    8714:      	mov	x3, x21
+    8718:      	bl	0xa120 <std::collections::list::List::_realloc(::List[$0],::SIMD[DType.int, 1]){conforms_to($0, ::AnyType & ::Movable)},T=[typevalue<#kgen.instref<std::simd::SIMD,dtype=ui8,length=1>>, scalar<ui8>]>
+    871c:      	mov	x20, x0
+    8720:      	cmp	x1, #0x0
+    8724:      	cset	w22, gt
+    8728:      	sub	x8, x21, x2
+    872c:      	cmp	x8, #0x1
+    8730:      	b.lt	0x8744 <main+0xc4>
+    8734:      	add	x0, x20, x2
+    8738:      	mov	w1, wzr
+    873c:      	mov	x2, x8
+    8740:      	bl	0xd5c0 <memset@plt>
+    8744:      	mov	w0, #0x1                // =1
+    8748:      	mov	x1, x20
+    874c:      	bl	0xd504 <cw_arg>
+    8750:      	adrp	x2, 0x3000 <global_constant+0x22b0>
+    8754:      	add	x2, x2, #0x400
+    8758:      	add	x4, sp, #0x100
+    875c:      	mov	x0, x20
+    8760:      	mov	x1, x21
+    8764:      	mov	x3, xzr
+    8768:      	bl	0xa2d0 <std::collections::string::string::String::__init__[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2]](*$0,sep:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()],end:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()]),Ts.values`2x=[[typevalue<#kgen.instref<std::collections::string::string_span::StringSpan,origin._mlir_origin`={  },origin={  }>>, struct<(pointer<none>, scalar<index>)>]]>
+    876c:      	cbz	w22, 0x8778 <main+0xf8>
+    8770:      	mov	x0, x20
+    8774:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8778:      	ldp	x8, x9, [sp, #0x100]
+    877c:      	stp	x8, x9, [sp, #0xa0]
+    8780:      	ldr	x10, [sp, #0x110]
+    8784:      	str	x10, [sp, #0xb0]
+    8788:      	tbnz	x10, #0x3f, 0x87e8 <main+0x168>
+    878c:      	cmp	x9, #0x7
+    8790:      	adrp	x15, 0x0 <write>
+    8794:      	add	x15, x15, #0xb50
+    8798:      	b.ne	0x8828 <main+0x1a8>
+    879c:      	cmp	x8, x15
+    87a0:      	b.eq	0x8840 <main+0x1c0>
+    87a4:      	mov	w9, #0x7                // =7
+    87a8:      	mov	x11, x8
+    87ac:      	b	0x8804 <main+0x184>
+    87b0:      	adrp	x8, 0x0 <write>
+    87b4:      	ldr	q0, [x8, #0x9b0]
+    87b8:      	adrp	x8, 0x3000 <global_constant+0x22b0>
+    87bc:      	add	x8, x8, #0x5c0
+    87c0:      	stur	q0, [sp, #0xa8]
+    87c4:      	str	x8, [sp, #0xa0]
+    87c8:      	mov	w8, #0x100              // =256
+    87cc:      	b	0x8844 <main+0x1c4>
+    87d0:      	mov	x2, xzr
+    87d4:      	mov	w22, wzr
+    87d8:      	sub	x8, x21, xzr
+    87dc:      	cmp	x8, #0x1
+    87e0:      	b.ge	0x8734 <main+0xb4>
+    87e4:      	b	0x8744 <main+0xc4>
+    87e8:      	and	x11, x10, #0x1f00000000000000
+    87ec:      	mov	x12, #0x700000000000000 // =504403158265495552
+    87f0:      	cmp	x11, x12
+    87f4:      	adrp	x15, 0x0 <write>
+    87f8:      	add	x15, x15, #0xb50
+    87fc:      	b.ne	0x9ab0 <main+0x1430>
+    8800:      	add	x11, sp, #0xa0
+    8804:      	mov	x12, xzr
+    8808:      	cmp	x12, #0x7
+    880c:      	b.eq	0x8840 <main+0x1c0>
+    8810:      	ldrb	w13, [x11, x12]
+    8814:      	ldrb	w14, [x15, x12]
+    8818:      	add	x12, x12, #0x1
+    881c:      	cmp	w13, w14
+    8820:      	b.eq	0x8808 <main+0x188>
+    8824:      	tbnz	x10, #0x3f, 0x9aac <main+0x142c>
+    8828:      	cmp	x9, #0x8
+    882c:      	b.ne	0x87c8 <main+0x148>
+    8830:      	adrp	x9, 0x0 <write>
+    8834:      	add	x9, x9, #0xb40
+    8838:      	cmp	x8, x9
+    883c:      	b.ne	0x9ac0 <main+0x1440>
+    8840:      	mov	w8, #0x1                // =1
+    8844:      	str	x8, [sp, #0x68]
+    8848:      	add	x28, sp, #0x100
+    884c:      	sub	x8, x19, #0x1
+    8850:      	cmp	x8, #0x2
+    8854:      	mov	w9, #0x2                // =2
+    8858:      	csel	x22, x8, x9, gt
+    885c:      	cmp	x8, #0x3
+    8860:      	b.lt	0x9420 <main+0xda0>
+    8864:      	mov	x19, xzr
+    8868:      	mov	w23, #0x2               // =2
+    886c:      	mov	w8, #0x3                // =3
+    8870:      	adrp	x29, 0x0 <write>
+    8874:      	add	x29, x29, #0xb30
+    8878:      	mov	w26, #0x20              // =32
+    887c:      	adrp	x9, 0x0 <write>
+    8880:      	ldr	q0, [x9, #0x9f0]
+    8884:      	str	q0, [sp, #0x40]
+    8888:      	adrp	x9, 0x0 <write>
+    888c:      	ldr	q0, [x9, #0xa40]
+    8890:      	str	q0, [sp, #0x30]
+    8894:      	adrp	x27, 0x0 <write>
+    8898:      	add	x27, x27, #0xb20
+    889c:      	str	x22, [sp, #0x70]
+    88a0:      	b	0x88b8 <main+0x238>
+    88a4:      	mov	x19, x20
+    88a8:      	add	x8, x21, #0x1
+    88ac:      	cmp	x21, x22
+    88b0:      	mov	x23, x21
+    88b4:      	b.eq	0x9424 <main+0xda4>
+    88b8:      	mov	x21, x8
+    88bc:      	mov	x0, x23
+    88c0:      	bl	0xd4dc <cw_arg_len>
+    88c4:      	mov	x24, x0
+    88c8:      	cmp	x0, #0x1
+    88cc:      	b.lt	0x896c <main+0x2ec>
+    88d0:      	mov	w0, #0x1                // =1
+    88d4:      	mov	x1, xzr
+    88d8:      	mov	x2, xzr
+    88dc:      	mov	x3, x24
+    88e0:      	bl	0xa120 <std::collections::list::List::_realloc(::List[$0],::SIMD[DType.int, 1]){conforms_to($0, ::AnyType & ::Movable)},T=[typevalue<#kgen.instref<std::simd::SIMD,dtype=ui8,length=1>>, scalar<ui8>]>
+    88e4:      	mov	x25, x0
+    88e8:      	cmp	x1, #0x0
+    88ec:      	cset	w20, gt
+    88f0:      	sub	x8, x24, x2
+    88f4:      	cmp	x8, #0x1
+    88f8:      	b.lt	0x890c <main+0x28c>
+    88fc:      	add	x0, x25, x2
+    8900:      	mov	w1, wzr
+    8904:      	mov	x2, x8
+    8908:      	bl	0xd5c0 <memset@plt>
+    890c:      	mov	x0, x23
+    8910:      	mov	x1, x25
+    8914:      	bl	0xd504 <cw_arg>
+    8918:      	add	x4, sp, #0x100
+    891c:      	mov	x0, x25
+    8920:      	mov	x1, x24
+    8924:      	adrp	x2, 0x3000 <global_constant+0x22b0>
+    8928:      	add	x2, x2, #0x400
+    892c:      	mov	x3, xzr
+    8930:      	bl	0xa2d0 <std::collections::string::string::String::__init__[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2]](*$0,sep:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()],end:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()]),Ts.values`2x=[[typevalue<#kgen.instref<std::collections::string::string_span::StringSpan,origin._mlir_origin`={  },origin={  }>>, struct<(pointer<none>, scalar<index>)>]]>
+    8934:      	cbz	w20, 0x8940 <main+0x2c0>
+    8938:      	mov	x0, x25
+    893c:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8940:      	ldr	x8, [sp, #0x110]
+    8944:      	tbnz	x8, #0x3f, 0x8988 <main+0x308>
+    8948:      	ldr	x9, [sp, #0x108]
+    894c:      	cmp	x9, #0x3
+    8950:      	b.ne	0x89bc <main+0x33c>
+    8954:      	ldr	x9, [sp, #0x100]
+    8958:      	cmp	x9, x29
+    895c:      	b.ne	0x899c <main+0x31c>
+    8960:      	mov	w20, #0x1               // =1
+    8964:      	tbnz	x8, #0x3e, 0x89c4 <main+0x344>
+    8968:      	b	0x89e4 <main+0x364>
+    896c:      	mov	x2, xzr
+    8970:      	mov	w20, wzr
+    8974:      	mov	w25, #0x1               // =1
+    8978:      	sub	x8, x24, xzr
+    897c:      	cmp	x8, #0x1
+    8980:      	b.ge	0x88fc <main+0x27c>
+    8984:      	b	0x890c <main+0x28c>
+    8988:      	and	x9, x8, #0x1f00000000000000
+    898c:      	mov	x10, #0x300000000000000 // =216172782113783808
+    8990:      	cmp	x9, x10
+    8994:      	b.ne	0x89bc <main+0x33c>
+    8998:      	add	x9, sp, #0x100
+    899c:      	mov	x10, xzr
+    89a0:      	cmp	x10, #0x3
+    89a4:      	b.eq	0x8960 <main+0x2e0>
+    89a8:      	ldrb	w11, [x9, x10]
+    89ac:      	ldrb	w12, [x29, x10]
+    89b0:      	add	x10, x10, #0x1
+    89b4:      	cmp	w11, w12
+    89b8:      	b.eq	0x89a0 <main+0x320>
+    89bc:      	mov	w20, wzr
+    89c0:      	tbz	x8, #0x3e, 0x89e4 <main+0x364>
+    89c4:      	ldr	x8, [sp, #0x100]
+    89c8:      	sub	x0, x8, #0x8
+    89cc:      	mov	x8, #-0x1               // =-1
+    89d0:      	ldaddl	x8, x8, [x0]
+    89d4:      	cmp	x8, #0x1
+    89d8:      	b.ne	0x89e4 <main+0x364>
+    89dc:      	dmb	ishld
+    89e0:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    89e4:      	cbz	w20, 0x8ae0 <main+0x460>
+    89e8:      	mov	x0, x21
+    89ec:      	bl	0xd4dc <cw_arg_len>
+    89f0:      	mov	x22, x0
+    89f4:      	cmp	x0, #0x1
+    89f8:      	b.lt	0x8b8c <main+0x50c>
+    89fc:      	mov	w0, #0x1                // =1
+    8a00:      	mov	x1, xzr
+    8a04:      	mov	x2, xzr
+    8a08:      	mov	x3, x22
+    8a0c:      	bl	0xa120 <std::collections::list::List::_realloc(::List[$0],::SIMD[DType.int, 1]){conforms_to($0, ::AnyType & ::Movable)},T=[typevalue<#kgen.instref<std::simd::SIMD,dtype=ui8,length=1>>, scalar<ui8>]>
+    8a10:      	mov	x23, x0
+    8a14:      	cmp	x1, #0x0
+    8a18:      	cset	w20, gt
+    8a1c:      	sub	x8, x22, x2
+    8a20:      	cmp	x8, #0x1
+    8a24:      	b.lt	0x8a38 <main+0x3b8>
+    8a28:      	add	x0, x23, x2
+    8a2c:      	mov	w1, wzr
+    8a30:      	mov	x2, x8
+    8a34:      	bl	0xd5c0 <memset@plt>
+    8a38:      	mov	x0, x21
+    8a3c:      	mov	x1, x23
+    8a40:      	bl	0xd504 <cw_arg>
+    8a44:      	add	x4, sp, #0xb8
+    8a48:      	mov	x0, x23
+    8a4c:      	mov	x1, x22
+    8a50:      	adrp	x2, 0x3000 <global_constant+0x22b0>
+    8a54:      	add	x2, x2, #0x400
+    8a58:      	mov	x3, xzr
+    8a5c:      	bl	0xa2d0 <std::collections::string::string::String::__init__[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2]](*$0,sep:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()],end:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()]),Ts.values`2x=[[typevalue<#kgen.instref<std::collections::string::string_span::StringSpan,origin._mlir_origin`={  },origin={  }>>, struct<(pointer<none>, scalar<index>)>]]>
+    8a60:      	cbz	w20, 0x8a6c <main+0x3ec>
+    8a64:      	mov	x0, x23
+    8a68:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8a6c:      	ldp	x10, x8, [sp, #0xc0]
+    8a70:      	cmn	x8, #0x1
+    8a74:      	ldr	x9, [sp, #0xb8]
+    8a78:      	add	x11, sp, #0xb8
+    8a7c:      	csel	x1, x9, x11, gt
+    8a80:      	ubfx	x8, x8, #56, #5
+    8a84:      	csel	x2, x10, x8, gt
+    8a88:      	cmp	x2, #0x1
+    8a8c:      	b.lt	0x9200 <main+0xb80>
+    8a90:      	mov	x8, xzr
+    8a94:      	mov	x25, x1
+    8a98:      	nop
+    8a9c:      	nop
+    8aa0:      	ldrsb	w22, [x25]
+    8aa4:      	sub	w9, w22, #0x9
+    8aa8:      	sub	w10, w22, #0x1c
+    8aac:      	cmp	w9, #0x5
+    8ab0:      	ccmp	w10, #0x3, #0x0, hs
+    8ab4:      	ccmp	w22, w26, #0x4, hs
+    8ab8:      	cset	w9, eq
+    8abc:      	tbnz	w22, #0x1f, 0x8c28 <main+0x5a8>
+    8ac0:      	cbz	w9, 0x8c28 <main+0x5a8>
+    8ac4:      	sub	x8, x8, #0x1
+    8ac8:      	add	x25, x25, #0x1
+    8acc:      	cmn	x2, x8
+    8ad0:      	b.ne	0x8aa0 <main+0x420>
+    8ad4:      	b	0x9200 <main+0xb80>
+    8ad8:      	nop
+    8adc:      	nop
+    8ae0:      	mov	x0, x23
+    8ae4:      	bl	0xd4dc <cw_arg_len>
+    8ae8:      	mov	x24, x0
+    8aec:      	cmp	x0, #0x1
+    8af0:      	b.lt	0x8ba8 <main+0x528>
+    8af4:      	mov	w0, #0x1                // =1
+    8af8:      	mov	x1, xzr
+    8afc:      	mov	x2, xzr
+    8b00:      	mov	x3, x24
+    8b04:      	bl	0xa120 <std::collections::list::List::_realloc(::List[$0],::SIMD[DType.int, 1]){conforms_to($0, ::AnyType & ::Movable)},T=[typevalue<#kgen.instref<std::simd::SIMD,dtype=ui8,length=1>>, scalar<ui8>]>
+    8b08:      	mov	x25, x0
+    8b0c:      	cmp	x1, #0x0
+    8b10:      	cset	w20, gt
+    8b14:      	sub	x8, x24, x2
+    8b18:      	cmp	x8, #0x1
+    8b1c:      	b.lt	0x8b30 <main+0x4b0>
+    8b20:      	add	x0, x25, x2
+    8b24:      	mov	w1, wzr
+    8b28:      	mov	x2, x8
+    8b2c:      	bl	0xd5c0 <memset@plt>
+    8b30:      	mov	x0, x23
+    8b34:      	mov	x1, x25
+    8b38:      	bl	0xd504 <cw_arg>
+    8b3c:      	add	x4, sp, #0x100
+    8b40:      	mov	x0, x25
+    8b44:      	mov	x1, x24
+    8b48:      	adrp	x2, 0x3000 <global_constant+0x22b0>
+    8b4c:      	add	x2, x2, #0x400
+    8b50:      	mov	x3, xzr
+    8b54:      	bl	0xa2d0 <std::collections::string::string::String::__init__[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2]](*$0,sep:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()],end:::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()]),Ts.values`2x=[[typevalue<#kgen.instref<std::collections::string::string_span::StringSpan,origin._mlir_origin`={  },origin={  }>>, struct<(pointer<none>, scalar<index>)>]]>
+    8b58:      	cbz	w20, 0x8b64 <main+0x4e4>
+    8b5c:      	mov	x0, x25
+    8b60:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8b64:      	ldr	x8, [sp, #0x110]
+    8b68:      	tbnz	x8, #0x3f, 0x8bc4 <main+0x544>
+    8b6c:      	ldr	x9, [sp, #0x108]
+    8b70:      	cmp	x9, #0x4
+    8b74:      	b.ne	0x8bfc <main+0x57c>
+    8b78:      	ldr	x9, [sp, #0x100]
+    8b7c:      	cmp	x9, x27
+    8b80:      	mov	x20, x21
+    8b84:      	b.ne	0x8bd8 <main+0x558>
+    8b88:      	b	0x8c00 <main+0x580>
+    8b8c:      	mov	x2, xzr
+    8b90:      	mov	w20, wzr
+    8b94:      	mov	w23, #0x1               // =1
+    8b98:      	sub	x8, x22, xzr
+    8b9c:      	cmp	x8, #0x1
+    8ba0:      	b.ge	0x8a28 <main+0x3a8>
+    8ba4:      	b	0x8a38 <main+0x3b8>
+    8ba8:      	mov	x2, xzr
+    8bac:      	mov	w20, wzr
+    8bb0:      	mov	w25, #0x1               // =1
+    8bb4:      	sub	x8, x24, xzr
+    8bb8:      	cmp	x8, #0x1
+    8bbc:      	b.ge	0x8b20 <main+0x4a0>
+    8bc0:      	b	0x8b30 <main+0x4b0>
+    8bc4:      	and	x9, x8, #0x1f00000000000000
+    8bc8:      	mov	x10, #0x400000000000000 // =288230376151711744
+    8bcc:      	cmp	x9, x10
+    8bd0:      	b.ne	0x8bfc <main+0x57c>
+    8bd4:      	add	x9, sp, #0x100
+    8bd8:      	mov	x10, xzr
+    8bdc:      	nop
+    8be0:      	cmp	x10, #0x4
+    8be4:      	b.eq	0x8c8c <main+0x60c>
+    8be8:      	ldrb	w11, [x9, x10]
+    8bec:      	ldrb	w12, [x27, x10]
+    8bf0:      	add	x10, x10, #0x1
+    8bf4:      	cmp	w11, w12
+    8bf8:      	b.eq	0x8be0 <main+0x560>
+    8bfc:      	mov	x20, x19
+    8c00:      	tbz	x8, #0x3e, 0x88a4 <main+0x224>
+    8c04:      	ldr	x8, [sp, #0x100]
+    8c08:      	sub	x0, x8, #0x8
+    8c0c:      	mov	x8, #-0x1               // =-1
+    8c10:      	ldaddl	x8, x8, [x0]
+    8c14:      	cmp	x8, #0x1
+    8c18:      	b.ne	0x88a4 <main+0x224>
+    8c1c:      	dmb	ishld
+    8c20:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8c24:      	b	0x88a4 <main+0x224>
+    8c28:      	cmp	w22, #0x2b
+    8c2c:      	cset	w9, eq
+    8c30:      	cmp	w22, #0x2d
+    8c34:      	csinc	w24, w9, wzr, ne
+    8c38:      	mov	x9, #-0x8000000000000000 // =-9223372036854775808
+    8c3c:      	cinv	x9, x9, ne
+    8c40:      	sub	x23, x24, x8
+    8c44:      	cmp	x23, x2
+    8c48:      	b.ge	0x9200 <main+0xb80>
+    8c4c:      	stp	x9, x1, [sp, #0x58]
+    8c50:      	add	x8, x23, #0x1
+    8c54:      	cmp	x8, x2
+    8c58:      	str	x2, [sp, #0x68]
+    8c5c:      	b.ge	0x8ef4 <main+0x874>
+    8c60:      	add	x8, x25, x24
+    8c64:      	ldrsb	w20, [x8, #0x1]
+    8c68:      	tbnz	w20, #0x1f, 0x8c98 <main+0x618>
+    8c6c:      	stp	xzr, xzr, [sp, #0xd0]
+    8c70:      	mov	x8, #-0x7f00000000000000 // =-9151314442816847872
+    8c74:      	str	x8, [sp, #0xe0]
+    8c78:      	add	x0, sp, #0xd0
+    8c7c:      	mov	x1, xzr
+    8c80:      	bl	0xa7d0 <std::collections::string::string::String::unsafe_ptr_mut(::String,::SIMD[DType.int, 1]$)>
+    8c84:      	strb	w20, [x0]
+    8c88:      	b	0x8ec4 <main+0x844>
+    8c8c:      	mov	x20, x21
+    8c90:      	tbnz	x8, #0x3e, 0x8c04 <main+0x584>
+    8c94:      	b	0x88a4 <main+0x224>
+    8c98:      	and	w8, w20, #0xff
+    8c9c:      	dup	v0.4s, w8
+    8ca0:      	ldr	q1, [sp, #0x40]
+    8ca4:      	cmhs	v0.4s, v0.4s, v1.4s
+    8ca8:      	addv	s0, v0.4s
+    8cac:      	fmov	w8, s0
+    8cb0:      	neg	w28, w8
+    8cb4:      	stp	xzr, xzr, [sp, #0x100]
+    8cb8:      	and	w10, w28, #0xf
+    8cbc:      	mov	x8, #-0x8000000000000000 // =-9223372036854775808
+    8cc0:      	and	w9, w28, #0xf
+    8cc4:      	str	x9, [sp, #0x10]
+    8cc8:      	orr	x8, x8, x10, lsl #56
+    8ccc:      	str	x8, [sp, #0x20]
+    8cd0:      	str	x8, [sp, #0x110]
+    8cd4:      	add	x0, sp, #0x100
+    8cd8:      	mov	x1, xzr
+    8cdc:      	bl	0xa7d0 <std::collections::string::string::String::unsafe_ptr_mut(::String,::SIMD[DType.int, 1]$)>
+    8ce0:      	mov	w8, #0xbf               // =191
+    8ce4:      	and	w8, w20, w8
+    8ce8:      	str	w8, [sp, #0x1c]
+    8cec:      	ubfx	w9, w20, #6, #2
+    8cf0:      	mov	w8, #-0x80              // =-128
+    8cf4:      	bfxil	w8, w20, #6, #2
+    8cf8:      	stp	w9, w8, [sp, #0x8]
+    8cfc:      	and	w8, w28, #0x7
+    8d00:      	cmp	w8, #0x1
+    8d04:      	str	w28, [sp, #0x2c]
+    8d08:      	b.ne	0x92f8 <main+0xc78>
+    8d0c:      	strb	w20, [x0]
+    8d10:      	ldp	x9, x28, [sp, #0x108]
+    8d14:      	tbz	x28, #0x3e, 0x8d40 <main+0x6c0>
+    8d18:      	ldr	x8, [sp, #0x100]
+    8d1c:      	sub	x0, x8, #0x8
+    8d20:      	mov	x8, #-0x1               // =-1
+    8d24:      	ldaddl	x8, x8, [x0]
+    8d28:      	cmp	x8, #0x1
+    8d2c:      	b.ne	0x8d40 <main+0x6c0>
+    8d30:      	dmb	ishld
+    8d34:      	str	x9, [sp, #0x10]
+    8d38:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8d3c:      	ldr	x9, [sp, #0x10]
+    8d40:      	ubfx	x8, x28, #56, #5
+    8d44:      	cmp	x28, #0x0
+    8d48:      	csel	x8, x8, x9, mi
+    8d4c:      	cmp	x8, #0x17
+    8d50:      	b.gt	0x8de0 <main+0x760>
+    8d54:      	stp	xzr, xzr, [sp, #0xd0]
+    8d58:      	mov	x8, #-0x8000000000000000 // =-9223372036854775808
+    8d5c:      	str	x8, [sp, #0xe0]
+    8d60:      	stp	xzr, xzr, [sp, #0x100]
+    8d64:      	ldr	x8, [sp, #0x20]
+    8d68:      	str	x8, [sp, #0x110]
+    8d6c:      	add	x0, sp, #0x100
+    8d70:      	mov	x1, xzr
+    8d74:      	bl	0xa7d0 <std::collections::string::string::String::unsafe_ptr_mut(::String,::SIMD[DType.int, 1]$)>
+    8d78:      	ldr	w8, [sp, #0x2c]
+    8d7c:      	and	w8, w8, #0x7
+    8d80:      	cmp	w8, #0x1
+    8d84:      	b.ne	0x931c <main+0xc9c>
+    8d88:      	strb	w20, [x0]
+    8d8c:      	add	x28, sp, #0x100
+    8d90:      	ldp	x10, x8, [sp, #0x108]
+    8d94:      	cmn	x8, #0x1
+    8d98:      	ldr	x9, [sp, #0x100]
+    8d9c:      	add	x11, sp, #0x100
+    8da0:      	csel	x1, x9, x11, gt
+    8da4:      	ubfx	x8, x8, #56, #5
+    8da8:      	csel	x2, x10, x8, gt
+    8dac:      	add	x0, sp, #0xd0
+    8db0:      	bl	0xa540 <std::collections::string::string::String::_iadd[LITImmOrigin,::Origin[False, $0]](::String,::Span[False, $0, ::SIMD[DType.uint8, 1], $1, AddressSpace.GENERIC])>
+    8db4:      	ldrb	w8, [sp, #0x117]
+    8db8:      	tbz	w8, #0x6, 0x8ec4 <main+0x844>
+    8dbc:      	ldr	x8, [sp, #0x100]
+    8dc0:      	sub	x0, x8, #0x8
+    8dc4:      	mov	x8, #-0x1               // =-1
+    8dc8:      	ldaddl	x8, x8, [x0]
+    8dcc:      	cmp	x8, #0x1
+    8dd0:      	b.ne	0x8ec4 <main+0x844>
+    8dd4:      	dmb	ishld
+    8dd8:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8ddc:      	b	0x8ec4 <main+0x844>
+    8de0:      	add	x28, x8, #0x7
+    8de4:      	and	x8, x28, #0xfffffffffffffff8
+    8de8:      	adds	x1, x8, #0x8
+    8dec:      	b.mi	0x98b4 <main+0x1234>
+    8df0:      	mov	w0, #0x1                // =1
+    8df4:      	bl	0xd230 <KGEN_CompilerRT_AlignedAlloc>
+    8df8:      	cbz	x0, 0x9c18 <main+0x1598>
+    8dfc:      	mov	w8, #0x1                // =1
+    8e00:      	str	x8, [x0], #0x8
+    8e04:      	stp	x0, xzr, [sp, #0xd0]
+    8e08:      	asr	x8, x28, #3
+    8e0c:      	orr	x8, x8, #0x4000000000000000
+    8e10:      	stp	x8, xzr, [sp, #0xe0]
+    8e14:      	str	xzr, [sp, #0x1100]
+    8e18:      	add	x8, sp, #0xd0
+    8e1c:      	str	x8, [sp, #0x1108]
+    8e20:      	ldr	x8, [sp, #0x20]
+    8e24:      	stp	xzr, x8, [sp, #0xf0]
+    8e28:      	add	x0, sp, #0xe8
+    8e2c:      	mov	x1, xzr
+    8e30:      	bl	0xa7d0 <std::collections::string::string::String::unsafe_ptr_mut(::String,::SIMD[DType.int, 1]$)>
+    8e34:      	ldr	w8, [sp, #0x2c]
+    8e38:      	and	w8, w8, #0x7
+    8e3c:      	cmp	w8, #0x1
+    8e40:      	b.ne	0x9364 <main+0xce4>
+    8e44:      	strb	w20, [x0]
+    8e48:      	add	x28, sp, #0x100
+    8e4c:      	ldp	x10, x8, [sp, #0xf0]
+    8e50:      	cmn	x8, #0x1
+    8e54:      	ldr	x9, [sp, #0xe8]
+    8e58:      	add	x11, sp, #0xe8
+    8e5c:      	csel	x1, x9, x11, gt
+    8e60:      	ubfx	x8, x8, #56, #5
+    8e64:      	csel	x2, x10, x8, gt
+    8e68:      	add	x0, sp, #0x100
+    8e6c:      	bl	0xab30 <std::format::_utils::_FlushingWriteBuffer::write_string[LITImmOrigin,::Origin[False, $4]](::_FlushingWriteBuffer[$0, $1, $2, $3],::StringSpan[$4, $5]),W=[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>],capacity_bytes=4096>
+    8e70:      	ldrb	w8, [sp, #0xff]
+    8e74:      	tbz	w8, #0x6, 0x8e98 <main+0x818>
+    8e78:      	ldr	x8, [sp, #0xe8]
+    8e7c:      	sub	x0, x8, #0x8
+    8e80:      	mov	x8, #-0x1               // =-1
+    8e84:      	ldaddl	x8, x8, [x0]
+    8e88:      	cmp	x8, #0x1
+    8e8c:      	b.ne	0x8e98 <main+0x818>
+    8e90:      	dmb	ishld
+    8e94:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8e98:      	ldr	x2, [sp, #0x1100]
+    8e9c:      	cmp	x2, #0x1, lsl #12       // =0x1000
+    8ea0:      	b.le	0x8eb8 <main+0x838>
+    8ea4:      	ldr	x0, [sp, #0x1108]
+    8ea8:      	add	x1, sp, #0x100
+    8eac:      	bl	0xa540 <std::collections::string::string::String::_iadd[LITImmOrigin,::Origin[False, $0]](::String,::Span[False, $0, ::SIMD[DType.uint8, 1], $1, AddressSpace.GENERIC])>
+    8eb0:      	mov	x2, xzr
+    8eb4:      	str	xzr, [sp, #0x1100]
+    8eb8:      	ldr	x0, [sp, #0x1108]
+    8ebc:      	add	x1, sp, #0x100
+    8ec0:      	bl	0xa540 <std::collections::string::string::String::_iadd[LITImmOrigin,::Origin[False, $0]](::String,::Span[False, $0, ::SIMD[DType.uint8, 1], $1, AddressSpace.GENERIC])>
+    8ec4:      	ldrb	w9, [x25, x24]
+    8ec8:      	ldr	x8, [sp, #0xe0]
+    8ecc:      	cmp	w9, #0x30
+    8ed0:      	tbz	x8, #0x3e, 0x8ef4 <main+0x874>
+    8ed4:      	ldr	x8, [sp, #0xd0]
+    8ed8:      	sub	x0, x8, #0x8
+    8edc:      	mov	x8, #-0x1               // =-1
+    8ee0:      	ldaddl	x8, x8, [x0]
+    8ee4:      	cmp	x8, #0x1
+    8ee8:      	b.ne	0x8ef4 <main+0x874>
+    8eec:      	dmb	ishld
+    8ef0:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    8ef4:      	mov	w0, #0x9                // =9
+    8ef8:      	mov	x1, xzr
+    8efc:      	bl	0xc3b0 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=index,length=1,writer.T`2x=[typevalue<#kgen.instref<std::format::_utils::_TotalWritableBytes>>, struct<(scalar<index>) memoryOnly>]>
+    8f00:      	cmp	x0, #0x17
+    8f04:      	b.gt	0x8f24 <main+0x8a4>
+    8f08:      	stp	xzr, xzr, [sp, #0xe8]
+    8f0c:      	mov	x8, #-0x8000000000000000 // =-9223372036854775808
+    8f10:      	str	x8, [sp, #0xf8]
+    8f14:      	add	x1, sp, #0xe8
+    8f18:      	mov	w0, #0x9                // =9
+    8f1c:      	bl	0xbbd0 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=index,length=1,writer.T`2x=[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]>
+    8f20:      	b	0x8f9c <main+0x91c>
+    8f24:      	add	x20, x0, #0x7
+    8f28:      	and	x8, x20, #0xfffffffffffffff8
+    8f2c:      	adds	x1, x8, #0x8
+    8f30:      	b.mi	0x98b4 <main+0x1234>
+    8f34:      	mov	w0, #0x1                // =1
+    8f38:      	bl	0xd230 <KGEN_CompilerRT_AlignedAlloc>
+    8f3c:      	cbz	x0, 0x9c18 <main+0x1598>
+    8f40:      	mov	w8, #0x1                // =1
+    8f44:      	str	x8, [x0], #0x8
+    8f48:      	stp	x0, xzr, [sp, #0xe8]
+    8f4c:      	asr	x8, x20, #3
+    8f50:      	orr	x8, x8, #0x4000000000000000
+    8f54:      	str	x8, [sp, #0xf8]
+    8f58:      	str	xzr, [sp, #0x1100]
+    8f5c:      	add	x8, sp, #0xe8
+    8f60:      	str	x8, [sp, #0x1108]
+    8f64:      	add	x1, sp, #0x100
+    8f68:      	mov	w0, #0x9                // =9
+    8f6c:      	bl	0xc010 <std::simd::SIMD::write_to[::Writer & ::AnyType](::SIMD[$0, $1],$2),dtype=index,length=1,writer.T`2x=[typevalue<#kgen.instref<std::format::_utils::_FlushingWriteBuffer,origin._mlir_origin`={  },origin={  },W=[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>],capacity_bytes=4096>>, struct<(struct<(array<4096, scalar<ui8>>) memoryOnly>, scalar<index>, pointer<none>) memoryOnly>]>
+    8f70:      	ldr	x2, [sp, #0x1100]
+    8f74:      	cmp	x2, #0x1, lsl #12       // =0x1000
+    8f78:      	b.le	0x8f90 <main+0x910>
+    8f7c:      	ldr	x0, [sp, #0x1108]
+    8f80:      	add	x1, sp, #0x100
+    8f84:      	bl	0xa540 <std::collections::string::string::String::_iadd[LITImmOrigin,::Origin[False, $0]](::String,::Span[False, $0, ::SIMD[DType.uint8, 1], $1, AddressSpace.GENERIC])>
+    8f88:      	mov	x2, xzr
+    8f8c:      	str	xzr, [sp, #0x1100]
+    8f90:      	ldr	x0, [sp, #0x1108]
+    8f94:      	add	x1, sp, #0x100
+    8f98:      	bl	0xa540 <std::collections::string::string::String::_iadd[LITImmOrigin,::Origin[False, $0]](::String,::Span[False, $0, ::SIMD[DType.uint8, 1], $1, AddressSpace.GENERIC])>
+    8f9c:      	ldp	x10, x8, [sp, #0xf0]
+    8fa0:      	cmn	x8, #0x1
+    8fa4:      	ldr	x9, [sp, #0xe8]
+    8fa8:      	add	x11, sp, #0xe8
+    8fac:      	csel	x12, x9, x11, gt
+    8fb0:      	ubfx	x11, x8, #56, #5
+    8fb4:      	csel	x10, x10, x11, gt
+    8fb8:      	ldp	x1, x2, [sp, #0x60]
+    8fbc:      	cbz	x10, 0x9c50 <main+0x15d0>
+    8fc0:      	ldrsb	x20, [x12]
+    8fc4:      	tbz	x20, #0x3f, 0x9020 <main+0x9a0>
+    8fc8:      	mvn	w10, w20, lsl #24
+    8fcc:      	clz	w10, w10
+    8fd0:      	mov	w11, #0x6               // =6
+    8fd4:      	mov	w13, #-0x6              // =-6
+    8fd8:      	madd	w11, w10, w11, w13
+    8fdc:      	and	x11, x11, #0xfe
+    8fe0:      	mov	w13, #0x7f              // =127
+    8fe4:      	lsr	w13, w13, w10
+    8fe8:      	and	w13, w13, w20
+    8fec:      	lsl	x20, x13, x11
+    8ff0:      	cmp	w10, #0x1
+    8ff4:      	b.eq	0x9020 <main+0x9a0>
+    8ff8:      	sub	x10, x10, #0x1
+    8ffc:      	sub	x11, x11, #0x6
+    9000:      	add	x12, x12, #0x1
+    9004:      	ldrb	w13, [x12], #0x1
+    9008:      	and	x13, x13, #0x3f
+    900c:      	lsl	x13, x13, x11
+    9010:      	orr	x20, x13, x20
+    9014:      	sub	x10, x10, #0x1
+    9018:      	sub	x11, x11, #0x6
+    901c:      	cbnz	x10, 0x9004 <main+0x984>
+    9020:      	tbz	x8, #0x3e, 0x9044 <main+0x9c4>
+    9024:      	sub	x0, x9, #0x8
+    9028:      	mov	x8, #-0x1               // =-1
+    902c:      	ldaddl	x8, x8, [x0]
+    9030:      	cmp	x8, #0x1
+    9034:      	b.ne	0x9044 <main+0x9c4>
+    9038:      	dmb	ishld
+    903c:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9040:      	ldp	x1, x2, [sp, #0x60]
+    9044:      	mov	x8, xzr
+    9048:      	mov	w10, w20
+    904c:      	add	x12, x1, #0x1
+    9050:      	mov	w9, #0x1                // =1
+    9054:      	ldr	x17, [sp, #0x58]
+    9058:      	add	x11, x12, x23
+    905c:      	sub	x14, x2, x23
+    9060:      	mvn	x13, x23
+    9064:      	add	x23, x23, #0x1
+    9068:      	mov	w16, w9
+    906c:      	mov	w15, w16
+    9070:      	cbz	x14, 0x91ec <main+0xb6c>
+    9074:      	ldurb	w16, [x11, #-0x1]
+    9078:      	cmp	w16, #0x5f
+    907c:      	b.ne	0x90a0 <main+0xa20>
+    9080:      	add	x11, x11, #0x1
+    9084:      	sub	x14, x14, #0x1
+    9088:      	add	x23, x23, #0x1
+    908c:      	sub	x13, x13, #0x1
+    9090:      	mov	w16, #0x1               // =1
+    9094:      	tbz	w15, #0x0, 0x906c <main+0x9ec>
+    9098:      	b	0x9200 <main+0xb80>
+    909c:      	nop
+    90a0:      	cmp	w16, #0x30
+    90a4:      	b.lo	0x9260 <main+0xbe0>
+    90a8:      	cmp	x10, x16
+    90ac:      	b.lo	0x9260 <main+0xbe0>
+    90b0:      	sub	x13, x16, #0x30
+    90b4:      	sub	x9, x17, x13
+    90b8:      	cmp	x8, x9
+    90bc:      	b.hi	0x9130 <main+0xab0>
+    90c0:      	mov	w9, wzr
+    90c4:      	add	x13, x13, x8
+    90c8:      	cmp	x23, x2
+    90cc:      	mov	x8, x13
+    90d0:      	b.ge	0x9058 <main+0x9d8>
+    90d4:      	mov	w9, wzr
+    90d8:      	ldrb	w8, [x11]
+    90dc:      	subs	w11, w8, #0xb
+    90e0:      	cmp	w8, #0x20
+    90e4:      	and	w14, w8, #0xfe
+    90e8:      	ccmp	w14, #0xc, #0x4, ne
+    90ec:      	ccmn	w11, #0x2, #0x2, ne
+    90f0:      	cset	w11, lo
+    90f4:      	sub	w14, w8, #0x1f
+    90f8:      	cmp	w8, #0xb
+    90fc:      	ccmn	w14, #0x3, #0x2, ne
+    9100:      	csel	w11, wzr, w11, hs
+    9104:      	cmp	wzr, w8, lsl #24
+    9108:      	csinc	w11, w11, wzr, le
+    910c:      	cmp	w11, #0x0
+    9110:      	mov	w8, #0xa                // =10
+    9114:      	csinc	x8, x8, xzr, ne
+    9118:      	mul	x8, x8, x13
+    911c:      	cbz	w11, 0x9058 <main+0x9d8>
+    9120:      	mov	x11, #-0x3333333333333334 // =-3689348814741910324
+    9124:      	movk	x11, #0xccc, lsl #48
+    9128:      	cmp	x13, x11
+    912c:      	b.ls	0x9058 <main+0x9d8>
+    9130:      	add	x3, sp, #0xe8
+    9134:      	mov	w0, #0xa                // =10
+    9138:      	bl	0xc630 <std::collections::string::string::_str_to_base_error[LITImmOrigin,::Origin[False, $0]](::SIMD[DType.int, 1],::StringSpan[$0, $1])>
+    913c:      	adrp	x8, 0x0 <write>
+    9140:      	add	x8, x8, #0xc90
+    9144:      	str	x8, [sp, #0x100]
+    9148:      	ldr	q0, [sp, #0x30]
+    914c:      	stur	q0, [x28, #0x8]
+    9150:      	add	x0, sp, #0xe8
+    9154:      	add	x1, sp, #0x100
+    9158:      	bl	0x9d30 <std::builtin::error::Error::__init__[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2]](*$0),Ts.values`2x=[[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>],[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]]>
+    915c:      	mov	x23, x0
+    9160:      	mov	x24, x1
+    9164:      	mov	x25, x2
+    9168:      	mov	x0, x3
+    916c:      	mov	w1, w4
+    9170:      	ldrb	w8, [sp, #0x117]
+    9174:      	tbz	w8, #0x6, 0x91ac <main+0xb2c>
+    9178:      	ldr	x8, [sp, #0x100]
+    917c:      	sub	x8, x8, #0x8
+    9180:      	mov	x9, #-0x1               // =-1
+    9184:      	ldaddl	x9, x9, [x8]
+    9188:      	cmp	x9, #0x1
+    918c:      	b.ne	0x91ac <main+0xb2c>
+    9190:      	dmb	ishld
+    9194:      	mov	x20, x0
+    9198:      	mov	x0, x8
+    919c:      	mov	w22, w1
+    91a0:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    91a4:      	mov	w1, w22
+    91a8:      	mov	x0, x20
+    91ac:      	ldrb	w8, [sp, #0xff]
+    91b0:      	tbz	w8, #0x6, 0x921c <main+0xb9c>
+    91b4:      	ldr	x8, [sp, #0xe8]
+    91b8:      	sub	x8, x8, #0x8
+    91bc:      	mov	x9, #-0x1               // =-1
+    91c0:      	ldaddl	x9, x9, [x8]
+    91c4:      	cmp	x9, #0x1
+    91c8:      	b.ne	0x921c <main+0xb9c>
+    91cc:      	dmb	ishld
+    91d0:      	mov	x20, x0
+    91d4:      	mov	x0, x8
+    91d8:      	mov	w22, w1
+    91dc:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    91e0:      	mov	w1, w22
+    91e4:      	mov	x0, x20
+    91e8:      	b	0x921c <main+0xb9c>
+    91ec:      	orr	w9, w9, w15
+    91f0:      	tbz	w9, #0x0, 0x92cc <main+0xc4c>
+    91f4:      	nop
+    91f8:      	nop
+    91fc:      	nop
+    9200:      	add	x3, sp, #0x100
+    9204:      	mov	w0, #0xa                // =10
+    9208:      	bl	0xc630 <std::collections::string::string::_str_to_base_error[LITImmOrigin,::Origin[False, $0]](::SIMD[DType.int, 1],::StringSpan[$0, $1])>
+    920c:      	ldp	x23, x24, [sp, #0x100]
+    9210:      	ldr	x25, [sp, #0x110]
+    9214:      	mov	x0, #-0x1               // =-1
+    9218:      	bl	0x9c90 <std::builtin::error::StackTrace::collect_if_enabled(::SIMD[DType.int, 1])>
+    921c:      	mov	w20, #0x1               // =1
+    9220:      	ldr	x22, [sp, #0x70]
+    9224:      	stp	x23, x24, [sp, #0x78]
+    9228:      	stp	x25, x0, [sp, #0x88]
+    922c:      	strb	w1, [sp, #0x98]
+    9230:      	ldrb	w8, [sp, #0xcf]
+    9234:      	tbz	w8, #0x6, 0x9258 <main+0xbd8>
+    9238:      	ldr	x8, [sp, #0xb8]
+    923c:      	sub	x0, x8, #0x8
+    9240:      	mov	x8, #-0x1               // =-1
+    9244:      	ldaddl	x8, x8, [x0]
+    9248:      	cmp	x8, #0x1
+    924c:      	b.ne	0x9258 <main+0xbd8>
+    9250:      	dmb	ishld
+    9254:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9258:      	tbz	w20, #0x0, 0x88a8 <main+0x228>
+    925c:      	b	0x985c <main+0x11dc>
+    9260:      	sub	w10, w16, #0x9
+    9264:      	sub	w12, w16, #0x1c
+    9268:      	cmp	w10, #0x5
+    926c:      	ccmp	w12, #0x3, #0x0, hs
+    9270:      	ccmp	w16, w26, #0x4, hs
+    9274:      	cset	w10, eq
+    9278:      	tbnz	w16, #0x7, 0x9200 <main+0xb80>
+    927c:      	cbz	w10, 0x9200 <main+0xb80>
+    9280:      	tbnz	w9, #0x0, 0x9200 <main+0xb80>
+    9284:      	mov	x9, xzr
+    9288:      	cmp	x2, x23
+    928c:      	csel	x10, x2, x23, gt
+    9290:      	add	x10, x10, x13
+    9294:      	cmp	x10, x9
+    9298:      	b.eq	0x92cc <main+0xc4c>
+    929c:      	ldrsb	w13, [x11, x9]
+    92a0:      	and	w12, w13, #0xff
+    92a4:      	sub	w14, w12, #0xe
+    92a8:      	sub	w15, w12, #0x1f
+    92ac:      	cmn	w14, #0x5
+    92b0:      	ccmn	w15, #0x3, #0x2, lo
+    92b4:      	ccmp	w12, w26, #0x4, lo
+    92b8:      	cset	w12, ne
+    92bc:      	tbnz	w13, #0x1f, 0x9200 <main+0xb80>
+    92c0:      	add	x9, x9, #0x1
+    92c4:      	cbz	w12, 0x9294 <main+0xc14>
+    92c8:      	b	0x9200 <main+0xb80>
+    92cc:      	mov	w20, wzr
+    92d0:      	cmp	w22, #0x2d
+    92d4:      	cneg	x8, x8, eq
+    92d8:      	str	x8, [sp, #0x68]
+    92dc:      	ldr	x22, [sp, #0x70]
+    92e0:      	stp	x23, x24, [sp, #0x78]
+    92e4:      	stp	x25, x0, [sp, #0x88]
+    92e8:      	strb	w1, [sp, #0x98]
+    92ec:      	ldrb	w8, [sp, #0xcf]
+    92f0:      	tbnz	w8, #0x6, 0x9238 <main+0xbb8>
+    92f4:      	b	0x9258 <main+0xbd8>
+    92f8:      	ldr	x8, [sp, #0x10]
+    92fc:      	cmp	w8, #0x2
+    9300:      	b.ne	0x933c <main+0xcbc>
+    9304:      	ldr	w8, [sp, #0x8]
+    9308:      	orr	w8, w8, #0xc0
+    930c:      	strb	w8, [x0]
+    9310:      	ldr	w8, [sp, #0x1c]
+    9314:      	strb	w8, [x0, #0x1]
+    9318:      	b	0x8d10 <main+0x690>
+    931c:      	cmp	w8, #0x2
+    9320:      	b.ne	0x9384 <main+0xd04>
+    9324:      	ldr	w8, [sp, #0x8]
+    9328:      	orr	w8, w8, #0xc0
+    932c:      	strb	w8, [x0]
+    9330:      	ldr	w8, [sp, #0x1c]
+    9334:      	strb	w8, [x0, #0x1]
+    9338:      	b	0x8d8c <main+0x70c>
+    933c:      	ldr	x8, [sp, #0x10]
+    9340:      	cmp	w8, #0x3
+    9344:      	b.ne	0x93a8 <main+0xd28>
+    9348:      	mov	w8, #0xe0               // =224
+    934c:      	strb	w8, [x0]
+    9350:      	ldr	w8, [sp, #0xc]
+    9354:      	strb	w8, [x0, #0x1]
+    9358:      	ldr	w8, [sp, #0x1c]
+    935c:      	strb	w8, [x0, #0x2]
+    9360:      	b	0x8d10 <main+0x690>
+    9364:      	cmp	w8, #0x2
+    9368:      	b.ne	0x93c4 <main+0xd44>
+    936c:      	ldr	w8, [sp, #0x8]
+    9370:      	orr	w8, w8, #0xc0
+    9374:      	strb	w8, [x0]
+    9378:      	ldr	w8, [sp, #0x1c]
+    937c:      	strb	w8, [x0, #0x1]
+    9380:      	b	0x8e48 <main+0x7c8>
+    9384:      	cmp	w8, #0x3
+    9388:      	b.ne	0x93e8 <main+0xd68>
+    938c:      	mov	w8, #0xe0               // =224
+    9390:      	strb	w8, [x0]
+    9394:      	ldr	w8, [sp, #0xc]
+    9398:      	strb	w8, [x0, #0x1]
+    939c:      	ldr	w8, [sp, #0x1c]
+    93a0:      	strb	w8, [x0, #0x2]
+    93a4:      	b	0x8d8c <main+0x70c>
+    93a8:      	mov	w8, #0x80f0             // =33008
+    93ac:      	strh	w8, [x0]
+    93b0:      	ldr	w8, [sp, #0xc]
+    93b4:      	strb	w8, [x0, #0x2]
+    93b8:      	ldr	w8, [sp, #0x1c]
+    93bc:      	strb	w8, [x0, #0x3]
+    93c0:      	b	0x8d10 <main+0x690>
+    93c4:      	cmp	w8, #0x3
+    93c8:      	b.ne	0x9404 <main+0xd84>
+    93cc:      	mov	w8, #0xe0               // =224
+    93d0:      	strb	w8, [x0]
+    93d4:      	ldr	w8, [sp, #0xc]
+    93d8:      	strb	w8, [x0, #0x1]
+    93dc:      	ldr	w8, [sp, #0x1c]
+    93e0:      	strb	w8, [x0, #0x2]
+    93e4:      	b	0x8e48 <main+0x7c8>
+    93e8:      	mov	w8, #0x80f0             // =33008
+    93ec:      	strh	w8, [x0]
+    93f0:      	ldr	w8, [sp, #0xc]
+    93f4:      	strb	w8, [x0, #0x2]
+    93f8:      	ldr	w8, [sp, #0x1c]
+    93fc:      	strb	w8, [x0, #0x3]
+    9400:      	b	0x8d8c <main+0x70c>
+    9404:      	mov	w8, #0x80f0             // =33008
+    9408:      	strh	w8, [x0]
+    940c:      	ldr	w8, [sp, #0xc]
+    9410:      	strb	w8, [x0, #0x2]
+    9414:      	ldr	w8, [sp, #0x1c]
+    9418:      	strb	w8, [x0, #0x3]
+    941c:      	b	0x8e48 <main+0x7c8>
+    9420:      	mov	x19, xzr
+    9424:      	ldr	x22, [sp, #0x68]
+    9428:      	lsl	x21, x22, #17
+    942c:      	cmp	x21, #0x1
+    9430:      	b.lt	0x94c4 <main+0xe44>
+    9434:      	mov	w0, #0x8                // =8
+    9438:      	mov	x1, xzr
+    943c:      	mov	x2, xzr
+    9440:      	mov	x3, x21
+    9444:      	bl	0x9fa0 <std::collections::list::List::_realloc(::List[$0],::SIMD[DType.int, 1]){conforms_to($0, ::AnyType & ::Movable)},T=[typevalue<#kgen.instref<std::simd::SIMD,dtype=ui64,length=1>>, scalar<ui64>]>
+    9448:      	mov	x20, x0
+    944c:      	cmp	x1, #0x0
+    9450:      	cset	w8, gt
+    9454:      	str	w8, [sp, #0x60]
+    9458:      	lsl	x22, x22, #20
+    945c:      	sub	x8, x21, x2
+    9460:      	cmp	x8, #0x1
+    9464:      	b.lt	0x947c <main+0xdfc>
+    9468:      	sub	x8, x22, x2, lsl #3
+    946c:      	add	x0, x20, x2, lsl #3
+    9470:      	mov	w1, wzr
+    9474:      	mov	x2, x8
+    9478:      	bl	0xd5c0 <memset@plt>
+    947c:      	ldr	x26, [sp, #0xb0]
+    9480:      	adrp	x27, 0x0 <write>
+    9484:      	add	x27, x27, #0xb10
+    9488:      	tbnz	x26, #0x3f, 0x94e4 <main+0xe64>
+    948c:      	ldr	x8, [sp, #0xa8]
+    9490:      	cmp	x8, #0x5
+    9494:      	b.ne	0x951c <main+0xe9c>
+    9498:      	ldr	x8, [sp, #0xa0]
+    949c:      	cmp	x8, x27
+    94a0:      	b.ne	0x94f8 <main+0xe78>
+    94a4:      	mov	w2, #0x1                // =1
+    94a8:      	str	x22, [sp, #0x70]
+    94ac:      	mov	x0, x20
+    94b0:      	mov	x1, x21
+    94b4:      	bl	0x8230 <cwprobe::fill_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)>
+    94b8:      	cmp	x19, #0x1
+    94bc:      	b.ge	0x9540 <main+0xec0>
+    94c0:      	b	0x954c <main+0xecc>
+    94c4:      	mov	x2, xzr
+    94c8:      	str	wzr, [sp, #0x60]
+    94cc:      	mov	w20, #0x8               // =8
+    94d0:      	lsl	x22, x22, #20
+    94d4:      	sub	x8, x21, xzr
+    94d8:      	cmp	x8, #0x1
+    94dc:      	b.ge	0x9468 <main+0xde8>
+    94e0:      	b	0x947c <main+0xdfc>
+    94e4:      	and	x8, x26, #0x1f00000000000000
+    94e8:      	mov	x9, #0x500000000000000  // =360287970189639680
+    94ec:      	cmp	x8, x9
+    94f0:      	b.ne	0x951c <main+0xe9c>
+    94f4:      	add	x8, sp, #0xa0
+    94f8:      	mov	x9, xzr
+    94fc:      	nop
+    9500:      	cmp	x9, #0x5
+    9504:      	b.eq	0x94a4 <main+0xe24>
+    9508:      	ldrb	w10, [x8, x9]
+    950c:      	ldrb	w11, [x27, x9]
+    9510:      	add	x9, x9, #0x1
+    9514:      	cmp	w10, w11
+    9518:      	b.eq	0x9500 <main+0xe80>
+    951c:      	mov	w2, wzr
+    9520:      	str	x22, [sp, #0x70]
+    9524:      	mov	x0, x20
+    9528:      	mov	x1, x21
+    952c:      	bl	0x8230 <cwprobe::fill_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::Bool)>
+    9530:      	cmp	x19, #0x1
+    9534:      	b.lt	0x954c <main+0xecc>
+    9538:      	nop
+    953c:      	nop
+    9540:      	mov	x0, x19
+    9544:      	bl	0xd540 <cw_exists_arg>
+    9548:      	cbz	x0, 0x9540 <main+0xec0>
+    954c:      	stp	xzr, xzr, [sp, #0x100]
+    9550:      	add	x1, sp, #0x100
+    9554:      	mov	w0, #0x1                // =1
+    9558:      	bl	0xd5d0 <clock_gettime@plt>
+    955c:      	mov	x23, xzr
+    9560:      	mov	x19, xzr
+    9564:      	ldp	x28, x29, [sp, #0x100]
+    9568:      	and	x13, x26, #0x1f00000000000000
+    956c:      	ubfx	x22, x26, #56, #5
+    9570:      	adrp	x24, 0x0 <write>
+    9574:      	add	x24, x24, #0xab0
+    9578:      	adrp	x25, 0x0 <write>
+    957c:      	add	x25, x25, #0xb40
+    9580:      	b	0x95dc <main+0xf5c>
+    9584:      	mov	x0, x20
+    9588:      	mov	x1, x23
+    958c:      	mov	w2, #0x100000           // =1048576
+    9590:      	bl	0x8020 <cwprobe::chase_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.uint64, 1],::SIMD[DType.int, 1])>
+    9594:      	mov	x23, x0
+    9598:      	mov	w8, #0x100000           // =1048576
+    959c:      	stp	xzr, xzr, [sp, #0x100]
+    95a0:      	add	x19, x8, x19
+    95a4:      	add	x1, sp, #0x100
+    95a8:      	mov	w0, #0x1                // =1
+    95ac:      	bl	0xd5d0 <clock_gettime@plt>
+    95b0:      	ldp	x8, x9, [sp, #0x100]
+    95b4:      	sub	x8, x8, x28
+    95b8:      	sub	x9, x9, x29
+    95bc:      	mov	w10, #0xca00            // =51712
+    95c0:      	movk	w10, #0x3b9a, lsl #16
+    95c4:      	madd	x3, x8, x10, x9
+    95c8:      	mov	w8, #0x6500             // =25856
+    95cc:      	movk	w8, #0x1dcd, lsl #16
+    95d0:      	cmp	x3, x8
+    95d4:      	and	x13, x26, #0x1f00000000000000
+    95d8:      	b.ge	0x98ec <main+0x126c>
+    95dc:      	tbnz	x26, #0x3f, 0x9604 <main+0xf84>
+    95e0:      	ldr	x8, [sp, #0xa8]
+    95e4:      	cmp	x8, #0x5
+    95e8:      	adrp	x12, 0x0 <write>
+    95ec:      	add	x12, x12, #0xb50
+    95f0:      	b.ne	0x9664 <main+0xfe4>
+    95f4:      	ldr	x8, [sp, #0xa0]
+    95f8:      	cmp	x8, x27
+    95fc:      	b.ne	0x962c <main+0xfac>
+    9600:      	b	0x9584 <main+0xf04>
+    9604:      	add	x8, sp, #0xa0
+    9608:      	cmp	x22, #0x6
+    960c:      	adrp	x12, 0x0 <write>
+    9610:      	add	x12, x12, #0xb50
+    9614:      	b.gt	0x96f0 <main+0x1070>
+    9618:      	cmp	x22, #0x5
+    961c:      	b.eq	0x962c <main+0xfac>
+    9620:      	cmp	x22, #0x6
+    9624:      	b.eq	0x9678 <main+0xff8>
+    9628:      	b	0x97c8 <main+0x1148>
+    962c:      	mov	x9, xzr
+    9630:      	nop
+    9634:      	nop
+    9638:      	nop
+    963c:      	nop
+    9640:      	cmp	x9, #0x5
+    9644:      	b.eq	0x9584 <main+0xf04>
+    9648:      	ldrb	w10, [x8, x9]
+    964c:      	ldrb	w11, [x27, x9]
+    9650:      	add	x9, x9, #0x1
+    9654:      	cmp	w10, w11
+    9658:      	b.eq	0x9640 <main+0xfc0>
+    965c:      	tbnz	x26, #0x3f, 0x9704 <main+0x1084>
+    9660:      	ldr	x8, [sp, #0xa8]
+    9664:      	cmp	x8, #0x6
+    9668:      	b.ne	0x96a4 <main+0x1024>
+    966c:      	ldr	x8, [sp, #0xa0]
+    9670:      	cmp	x8, x24
+    9674:      	b.eq	0x96d8 <main+0x1058>
+    9678:      	mov	x9, xzr
+    967c:      	nop
+    9680:      	cmp	x9, #0x6
+    9684:      	b.eq	0x96d8 <main+0x1058>
+    9688:      	ldrb	w10, [x8, x9]
+    968c:      	ldrb	w11, [x24, x9]
+    9690:      	add	x9, x9, #0x1
+    9694:      	cmp	w10, w11
+    9698:      	b.eq	0x9680 <main+0x1000>
+    969c:      	tbnz	x26, #0x3f, 0x9724 <main+0x10a4>
+    96a0:      	ldr	x8, [sp, #0xa8]
+    96a4:      	cmp	x8, #0x8
+    96a8:      	b.ne	0x9768 <main+0x10e8>
+    96ac:      	ldr	x8, [sp, #0xa0]
+    96b0:      	cmp	x8, x25
+    96b4:      	b.ne	0x9740 <main+0x10c0>
+    96b8:      	and	w8, w23, #0x7
+    96bc:      	ucvtf	d0, w8
+    96c0:      	mov	w0, #0x1000000          // =16777216
+    96c4:      	bl	0x8180 <cwprobe::fmachain_k(::SIMD[DType.float64, 1],::SIMD[DType.int, 1])>
+    96c8:      	fcvtzu	x8, d0
+    96cc:      	add	x23, x23, x8
+    96d0:      	mov	w8, #0x1000000          // =16777216
+    96d4:      	b	0x959c <main+0xf1c>
+    96d8:      	mov	x0, x20
+    96dc:      	mov	x1, x21
+    96e0:      	bl	0x8040 <cwprobe::stream_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1])>
+    96e4:      	add	x23, x0, x23
+    96e8:      	ldr	x8, [sp, #0x70]
+    96ec:      	b	0x959c <main+0xf1c>
+    96f0:      	cmp	x22, #0x7
+    96f4:      	b.eq	0x97a8 <main+0x1128>
+    96f8:      	cmp	x22, #0x8
+    96fc:      	b.eq	0x9740 <main+0x10c0>
+    9700:      	b	0x97c8 <main+0x1148>
+    9704:      	add	x8, sp, #0xa0
+    9708:      	mov	x9, #0x600000000000000  // =432345564227567616
+    970c:      	cmp	x13, x9
+    9710:      	b.eq	0x9678 <main+0xff8>
+    9714:      	mov	x9, #0x700000000000000  // =504403158265495552
+    9718:      	cmp	x13, x9
+    971c:      	b.ne	0x9734 <main+0x10b4>
+    9720:      	b	0x97a8 <main+0x1128>
+    9724:      	add	x8, sp, #0xa0
+    9728:      	mov	x9, #0x700000000000000  // =504403158265495552
+    972c:      	cmp	x13, x9
+    9730:      	b.eq	0x97a8 <main+0x1128>
+    9734:      	mov	x9, #0x800000000000000  // =576460752303423488
+    9738:      	cmp	x13, x9
+    973c:      	b.ne	0x97c8 <main+0x1148>
+    9740:      	mov	x9, xzr
+    9744:      	cmp	x9, #0x8
+    9748:      	b.eq	0x96b8 <main+0x1038>
+    974c:      	ldrb	w10, [x8, x9]
+    9750:      	ldrb	w11, [x25, x9]
+    9754:      	add	x9, x9, #0x1
+    9758:      	cmp	w10, w11
+    975c:      	b.eq	0x9744 <main+0x10c4>
+    9760:      	tbnz	x26, #0x3f, 0x9798 <main+0x1118>
+    9764:      	ldr	x8, [sp, #0xa8]
+    9768:      	cmp	x8, #0x7
+    976c:      	b.ne	0x97c8 <main+0x1148>
+    9770:      	ldr	x8, [sp, #0xa0]
+    9774:      	cmp	x8, x12
+    9778:      	b.ne	0x97a8 <main+0x1128>
+    977c:      	mov	x0, x20
+    9780:      	mov	x1, x21
+    9784:      	mov	x2, x23
+    9788:      	bl	0x81d0 <cwprobe::branchy_k(::Pointer[True, `0 MutUntrackedOrigin, ::SIMD[DType.uint64, 1], ::Origin[True, `0](), AddressSpace.GENERIC],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])>
+    978c:      	mov	x23, x0
+    9790:      	mov	x8, x21
+    9794:      	b	0x959c <main+0xf1c>
+    9798:      	mov	x8, #0x700000000000000  // =504403158265495552
+    979c:      	cmp	x13, x8
+    97a0:      	b.ne	0x97c8 <main+0x1148>
+    97a4:      	add	x8, sp, #0xa0
+    97a8:      	mov	x9, xzr
+    97ac:      	cmp	x9, #0x7
+    97b0:      	b.eq	0x977c <main+0x10fc>
+    97b4:      	ldrb	w10, [x8, x9]
+    97b8:      	ldrb	w11, [x12, x9]
+    97bc:      	add	x9, x9, #0x1
+    97c0:      	cmp	w10, w11
+    97c4:      	b.eq	0x97ac <main+0x112c>
+    97c8:      	ldr	w8, [sp, #0x60]
+    97cc:      	cbz	w8, 0x97d8 <main+0x1158>
+    97d0:      	mov	x0, x20
+    97d4:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    97d8:      	add	x19, sp, #0x100
+    97dc:      	tbz	x26, #0x3e, 0x9800 <main+0x1180>
+    97e0:      	ldr	x8, [sp, #0xa0]
+    97e4:      	sub	x0, x8, #0x8
+    97e8:      	mov	x8, #-0x1               // =-1
+    97ec:      	ldaddl	x8, x8, [x0]
+    97f0:      	cmp	x8, #0x1
+    97f4:      	b.ne	0x9800 <main+0x1180>
+    97f8:      	dmb	ishld
+    97fc:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9800:      	adrp	x8, 0x0 <write>
+    9804:      	add	x8, x8, #0xac0
+    9808:      	str	x8, [sp, #0x100]
+    980c:      	adrp	x8, 0x0 <write>
+    9810:      	ldr	q0, [x8, #0x9d0]
+    9814:      	stur	q0, [x19, #0x8]
+    9818:      	adrp	x1, 0x3000 <global_constant+0x22b0>
+    981c:      	add	x1, x1, #0x5a0
+    9820:      	add	x0, sp, #0x100
+    9824:      	mov	w2, #0x1                // =1
+    9828:      	mov	w3, wzr
+    982c:      	mov	w4, #0x1                // =1
+    9830:      	bl	0xcdf0 <std::io::io::print[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2],LITImmOrigin,::Origin[False, $4],LITImmOrigin,::Origin[False, $6]](*$0,sep:::StringSpan[$4, $5],end:::StringSpan[$6, $7],flush:::Bool,file:::RawFileDescriptor$),Ts.values`=[[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]]>
+    9834:      	ldrb	w8, [sp, #0x117]
+    9838:      	tbz	w8, #0x6, 0x9938 <main+0x12b8>
+    983c:      	ldr	x8, [sp, #0x100]
+    9840:      	sub	x0, x8, #0x8
+    9844:      	mov	x8, #-0x1               // =-1
+    9848:      	ldaddl	x8, x8, [x0]
+    984c:      	cmp	x8, #0x1
+    9850:      	b.ne	0x9938 <main+0x12b8>
+    9854:      	dmb	ishld
+    9858:      	b	0x9934 <main+0x12b4>
+    985c:      	ldrb	w8, [sp, #0xb7]
+    9860:      	tbz	w8, #0x6, 0x9884 <main+0x1204>
+    9864:      	ldr	x8, [sp, #0xa0]
+    9868:      	sub	x0, x8, #0x8
+    986c:      	mov	x8, #-0x1               // =-1
+    9870:      	ldaddl	x8, x8, [x0]
+    9874:      	cmp	x8, #0x1
+    9878:      	b.ne	0x9884 <main+0x1204>
+    987c:      	dmb	ishld
+    9880:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9884:      	ldrb	w8, [sp, #0x98]
+    9888:      	cbz	w8, 0x99a4 <main+0x1324>
+    988c:      	mov	x8, xzr
+    9890:      	ldr	x19, [sp, #0x90]
+    9894:      	ldr	x1, [x19, #0x10]
+    9898:      	mov	x9, #0x7fffffffffffffff // =9223372036854775807
+    989c:      	nop
+    98a0:      	ldrb	w10, [x1, x8]
+    98a4:      	cbz	w10, 0x9964 <main+0x12e4>
+    98a8:      	add	x8, x8, #0x1
+    98ac:      	cmp	x8, x9
+    98b0:      	b.ne	0x98a0 <main+0x1220>
+    98b4:      	adrp	x8, 0x3000 <global_constant+0x22b0>
+    98b8:      	add	x8, x8, #0x430
+    98bc:      	mov	w9, #0x1d               // =29
+    98c0:      	stp	x8, x9, [sp, #0x100]
+    98c4:      	mov	x8, #0x2000000000000000 // =2305843009213693952
+    98c8:      	str	x8, [sp, #0x110]
+    98cc:      	adrp	x2, 0x3000 <global_constant+0x22b0>
+    98d0:      	add	x2, x2, #0x450
+    98d4:      	add	x4, sp, #0x100
+    98d8:      	mov	w0, #0x3ea              // =1002
+    98dc:      	mov	w1, #0x12               // =18
+    98e0:      	mov	w3, #0x21               // =33
+    98e4:      	bl	0xd0d0 <std::os::os::_abort_report[::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()],::Writable & ::AnyType](::SourceLocation,$1),prefix={ #interp.memref<{[(#interp.memory_handle<16, ~QABORT:\00~Q string>, const_global, [], [])], []}, 0, 0>, 6 },message.T`=[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]>
+    98e8:      	brk	#0x1
+    98ec:      	add	x0, sp, #0xa0
+    98f0:      	ldr	x1, [sp, #0x68]
+    98f4:      	mov	x2, x19
+    98f8:      	mov	x4, x23
+    98fc:      	bl	0x82b0 <cwprobe::report(::String,::SIMD[DType.int, 1],::SIMD[DType.int, 1],::SIMD[DType.int, 1],::SIMD[DType.uint64, 1])>
+    9900:      	ldrb	w8, [sp, #0xb7]
+    9904:      	tbz	w8, #0x6, 0x9928 <main+0x12a8>
+    9908:      	ldr	x8, [sp, #0xa0]
+    990c:      	sub	x0, x8, #0x8
+    9910:      	mov	x8, #-0x1               // =-1
+    9914:      	ldaddl	x8, x8, [x0]
+    9918:      	cmp	x8, #0x1
+    991c:      	b.ne	0x9928 <main+0x12a8>
+    9920:      	dmb	ishld
+    9924:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9928:      	ldr	w8, [sp, #0x60]
+    992c:      	cbz	w8, 0x9938 <main+0x12b8>
+    9930:      	mov	x0, x20
+    9934:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9938:      	bl	0xd37c <KGEN_CompilerRT_DestroyGlobals>
+    993c:      	mov	w0, wzr
+    9940:      	add	sp, sp, #0x1, lsl #12   // =0x1000
+    9944:      	add	sp, sp, #0x110
+    9948:      	ldp	x20, x19, [sp, #0x50]
+    994c:      	ldp	x22, x21, [sp, #0x40]
+    9950:      	ldp	x24, x23, [sp, #0x30]
+    9954:      	ldp	x26, x25, [sp, #0x20]
+    9958:      	ldp	x28, x27, [sp, #0x10]
+    995c:      	ldp	x29, x30, [sp], #0x60
+    9960:      	ret
+    9964:      	cmp	x8, #0x17
+    9968:      	b.hi	0x9a14 <main+0x1394>
+    996c:      	mov	x2, xzr
+    9970:      	stp	xzr, xzr, [sp, #0xe8]
+    9974:      	mov	x8, #-0x8000000000000000 // =-9223372036854775808
+    9978:      	str	x8, [sp, #0xf8]
+    997c:      	nop
+    9980:      	ldrb	w8, [x1, x2]
+    9984:      	cbz	w8, 0x999c <main+0x131c>
+    9988:      	add	x2, x2, #0x1
+    998c:      	mov	x8, #0x7fffffffffffffff // =9223372036854775807
+    9990:      	cmp	x2, x8
+    9994:      	b.ne	0x9980 <main+0x1300>
+    9998:      	mov	x2, #0x7fffffffffffffff // =9223372036854775807
+    999c:      	add	x0, sp, #0xe8
+    99a0:      	b	0x9af8 <main+0x1478>
+    99a4:      	mov	x8, #-0x4000000000000000 // =-4611686018427387904
+    99a8:      	stp	x9, x10, [sp, #0xd0]
+    99ac:      	str	x8, [sp, #0xe0]
+    99b0:      	lsr	x8, x8, #62
+    99b4:      	cmp	x8, #0x3
+    99b8:      	b.lo	0x9b18 <main+0x1498>
+    99bc:      	adrp	x8, 0x0 <write>
+    99c0:      	add	x8, x8, #0xc00
+    99c4:      	str	x8, [sp, #0x100]
+    99c8:      	adrp	x8, 0x0 <write>
+    99cc:      	ldr	q0, [x8, #0x990]
+    99d0:      	stur	q0, [x28, #0x8]
+    99d4:      	adrp	x1, 0x3000 <global_constant+0x22b0>
+    99d8:      	add	x1, x1, #0x5a0
+    99dc:      	add	x0, sp, #0x100
+    99e0:      	mov	w2, #0x1                // =1
+    99e4:      	mov	w3, wzr
+    99e8:      	mov	w4, #0x2                // =2
+    99ec:      	bl	0xcdf0 <std::io::io::print[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2],LITImmOrigin,::Origin[False, $4],LITImmOrigin,::Origin[False, $6]](*$0,sep:::StringSpan[$4, $5],end:::StringSpan[$6, $7],flush:::Bool,file:::RawFileDescriptor$),Ts.values`=[[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]]>
+    99f0:      	ldrb	w8, [sp, #0x117]
+    99f4:      	tbz	w8, #0x6, 0x9b68 <main+0x14e8>
+    99f8:      	ldr	x8, [sp, #0x100]
+    99fc:      	sub	x0, x8, #0x8
+    9a00:      	mov	x8, #-0x1               // =-1
+    9a04:      	ldaddl	x8, x8, [x0]
+    9a08:      	cmp	x8, #0x1
+    9a0c:      	b.eq	0x9b60 <main+0x14e0>
+    9a10:      	b	0x9b68 <main+0x14e8>
+    9a14:      	add	x20, x8, #0x7
+    9a18:      	and	x8, x20, #0xfffffffffffffff8
+    9a1c:      	adds	x1, x8, #0x8
+    9a20:      	b.mi	0x98b4 <main+0x1234>
+    9a24:      	mov	w0, #0x1                // =1
+    9a28:      	bl	0xd230 <KGEN_CompilerRT_AlignedAlloc>
+    9a2c:      	cbz	x0, 0x9c18 <main+0x1598>
+    9a30:      	mov	x2, xzr
+    9a34:      	mov	w8, #0x1                // =1
+    9a38:      	str	x8, [x0], #0x8
+    9a3c:      	stp	x0, xzr, [sp, #0xe8]
+    9a40:      	asr	x8, x20, #3
+    9a44:      	orr	x8, x8, #0x4000000000000000
+    9a48:      	str	x8, [sp, #0xf8]
+    9a4c:      	str	xzr, [sp, #0x1100]
+    9a50:      	add	x8, sp, #0xe8
+    9a54:      	str	x8, [sp, #0x1108]
+    9a58:      	ldr	x1, [x19, #0x10]
+    9a5c:      	nop
+    9a60:      	ldrb	w8, [x1, x2]
+    9a64:      	cbz	w8, 0x9a7c <main+0x13fc>
+    9a68:      	add	x2, x2, #0x1
+    9a6c:      	mov	x8, #0x7fffffffffffffff // =9223372036854775807
+    9a70:      	cmp	x2, x8
+    9a74:      	b.ne	0x9a60 <main+0x13e0>
+    9a78:      	mov	x2, #0x7fffffffffffffff // =9223372036854775807
+    9a7c:      	add	x0, sp, #0x100
+    9a80:      	bl	0xab30 <std::format::_utils::_FlushingWriteBuffer::write_string[LITImmOrigin,::Origin[False, $4]](::_FlushingWriteBuffer[$0, $1, $2, $3],::StringSpan[$4, $5]),W=[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>],capacity_bytes=4096>
+    9a84:      	ldr	x2, [sp, #0x1100]
+    9a88:      	cmp	x2, #0x1, lsl #12       // =0x1000
+    9a8c:      	b.le	0x9aec <main+0x146c>
+    9a90:      	ldr	x0, [sp, #0x1108]
+    9a94:      	add	x19, sp, #0x100
+    9a98:      	add	x1, sp, #0x100
+    9a9c:      	bl	0xa540 <std::collections::string::string::String::_iadd[LITImmOrigin,::Origin[False, $0]](::String,::Span[False, $0, ::SIMD[DType.uint8, 1], $1, AddressSpace.GENERIC])>
+    9aa0:      	mov	x2, xzr
+    9aa4:      	str	xzr, [sp, #0x1100]
+    9aa8:      	b	0x9af0 <main+0x1470>
+    9aac:      	and	x11, x10, #0x1f00000000000000
+    9ab0:      	mov	x8, #0x800000000000000  // =576460752303423488
+    9ab4:      	cmp	x11, x8
+    9ab8:      	b.ne	0x87c8 <main+0x148>
+    9abc:      	add	x8, sp, #0xa0
+    9ac0:      	mov	x9, xzr
+    9ac4:      	adrp	x10, 0x0 <write>
+    9ac8:      	add	x10, x10, #0xb40
+    9acc:      	cmp	x9, #0x8
+    9ad0:      	b.eq	0x8840 <main+0x1c0>
+    9ad4:      	ldrb	w11, [x8, x9]
+    9ad8:      	ldrb	w12, [x10, x9]
+    9adc:      	add	x9, x9, #0x1
+    9ae0:      	cmp	w11, w12
+    9ae4:      	b.eq	0x9acc <main+0x144c>
+    9ae8:      	b	0x87c8 <main+0x148>
+    9aec:      	add	x19, sp, #0x100
+    9af0:      	ldr	x0, [sp, #0x1108]
+    9af4:      	mov	x1, x19
+    9af8:      	bl	0xa540 <std::collections::string::string::String::_iadd[LITImmOrigin,::Origin[False, $0]](::String,::Span[False, $0, ::SIMD[DType.uint8, 1], $1, AddressSpace.GENERIC])>
+    9afc:      	ldp	x9, x10, [sp, #0xe8]
+    9b00:      	ldr	x8, [sp, #0xf8]
+    9b04:      	stp	x9, x10, [sp, #0xd0]
+    9b08:      	str	x8, [sp, #0xe0]
+    9b0c:      	lsr	x8, x8, #62
+    9b10:      	cmp	x8, #0x3
+    9b14:      	b.hs	0x99bc <main+0x133c>
+    9b18:      	adrp	x1, 0x3000 <global_constant+0x22b0>
+    9b1c:      	add	x1, x1, #0x5a0
+    9b20:      	add	x0, sp, #0xd0
+    9b24:      	mov	w2, #0x1                // =1
+    9b28:      	mov	w3, wzr
+    9b2c:      	mov	w4, #0x2                // =2
+    9b30:      	bl	0xcdf0 <std::io::io::print[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2],LITImmOrigin,::Origin[False, $4],LITImmOrigin,::Origin[False, $6]](*$0,sep:::StringSpan[$4, $5],end:::StringSpan[$6, $7],flush:::Bool,file:::RawFileDescriptor$),Ts.values`=[[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]]>
+    9b34:      	ldr	x8, [sp, #0xe0]
+    9b38:      	lsr	x9, x8, #62
+    9b3c:      	tst	x8, #0x4000000000000000
+    9b40:      	ccmp	x9, #0x2, #0x2, ne
+    9b44:      	b.hi	0x9b68 <main+0x14e8>
+    9b48:      	ldr	x8, [sp, #0xd0]
+    9b4c:      	sub	x0, x8, #0x8
+    9b50:      	mov	x8, #-0x1               // =-1
+    9b54:      	ldaddl	x8, x8, [x0]
+    9b58:      	cmp	x8, #0x1
+    9b5c:      	b.ne	0x9b68 <main+0x14e8>
+    9b60:      	dmb	ishld
+    9b64:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9b68:      	adrp	x8, 0x0 <write>
+    9b6c:      	add	x8, x8, #0xbd0
+    9b70:      	str	x8, [sp, #0x100]
+    9b74:      	adrp	x8, 0x0 <write>
+    9b78:      	ldr	q0, [x8, #0x980]
+    9b7c:      	stur	q0, [x28, #0x8]
+    9b80:      	adrp	x2, 0x3000 <global_constant+0x22b0>
+    9b84:      	add	x2, x2, #0x5b0
+    9b88:      	adrp	x4, 0x3000 <global_constant+0x22b0>
+    9b8c:      	add	x4, x4, #0x5a0
+    9b90:      	add	x0, sp, #0x100
+    9b94:      	add	x1, sp, #0x78
+    9b98:      	mov	w3, #0x1                // =1
+    9b9c:      	mov	w5, #0x1                // =1
+    9ba0:      	mov	w6, wzr
+    9ba4:      	mov	w7, #0x2                // =2
+    9ba8:      	bl	0xca50 <std::io::io::print[KGENParamList[::Writable & ::AnyType],*::Writable & ::AnyType,LITImmOrigin,::Origin[False, $2],LITImmOrigin,::Origin[False, $4],LITImmOrigin,::Origin[False, $6]](*$0,sep:::StringSpan[$4, $5],end:::StringSpan[$6, $7],flush:::Bool,file:::RawFileDescriptor$),Ts.values`=[[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>],[typevalue<#kgen.instref<std::builtin::error::Error>>, struct<(struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>, struct<(struct<(struct<(variant<struct<()>, struct<(pointer<none>) memoryOnly>>) memoryOnly>) memoryOnly>) memoryOnly>) memoryOnly>]]>
+    9bac:      	ldrb	w8, [sp, #0x117]
+    9bb0:      	tbz	w8, #0x6, 0x9bd4 <main+0x1554>
+    9bb4:      	ldr	x8, [sp, #0x100]
+    9bb8:      	sub	x0, x8, #0x8
+    9bbc:      	mov	x8, #-0x1               // =-1
+    9bc0:      	ldaddl	x8, x8, [x0]
+    9bc4:      	cmp	x8, #0x1
+    9bc8:      	b.ne	0x9bd4 <main+0x1554>
+    9bcc:      	dmb	ishld
+    9bd0:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9bd4:      	ldrb	w8, [sp, #0x8f]
+    9bd8:      	tbz	w8, #0x6, 0x9bfc <main+0x157c>
+    9bdc:      	ldr	x8, [sp, #0x78]
+    9be0:      	sub	x0, x8, #0x8
+    9be4:      	mov	x8, #-0x1               // =-1
+    9be8:      	ldaddl	x8, x8, [x0]
+    9bec:      	cmp	x8, #0x1
+    9bf0:      	b.ne	0x9bfc <main+0x157c>
+    9bf4:      	dmb	ishld
+    9bf8:      	bl	0xd270 <KGEN_CompilerRT_AlignedFree>
+    9bfc:      	ldrb	w8, [sp, #0x98]
+    9c00:      	cmp	w8, #0x1
+    9c04:      	b.ne	0x9c10 <main+0x1590>
+    9c08:      	ldr	x0, [sp, #0x90]
+    9c0c:      	bl	0xade0 <std::memory::arc_pointer::ArcPointer::__deinit__(::ArcPointer[$0]$){conforms_to($0, ::AnyType & ::Deinitable)},T=[typevalue<#kgen.instref<std::memory::owned_pointer::OwnedPointer,T=[typevalue<#kgen.instref<std::simd::SIMD,dtype=ui8,length=1>>, scalar<ui8>]>>, pointer<none>]>
+    9c10:      	mov	w0, #0x1                // =1
+    9c14:      	b	0x9940 <main+0x12c0>
+    9c18:      	adrp	x8, 0x3000 <global_constant+0x22b0>
+    9c1c:      	add	x8, x8, #0x4d0
+    9c20:      	mov	w9, #0x25               // =37
+    9c24:      	stp	x8, x9, [sp, #0x100]
+    9c28:      	mov	x8, #0x2000000000000000 // =2305843009213693952
+    9c2c:      	str	x8, [sp, #0x110]
+    9c30:      	adrp	x2, 0x3000 <global_constant+0x22b0>
+    9c34:      	add	x2, x2, #0x450
+    9c38:      	add	x4, sp, #0x100
+    9c3c:      	mov	w0, #0x313              // =787
+    9c40:      	mov	w1, #0xe                // =14
+    9c44:      	mov	w3, #0x21               // =33
+    9c48:      	bl	0xd0d0 <std::os::os::_abort_report[::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()],::Writable & ::AnyType](::SourceLocation,$1),prefix={ #interp.memref<{[(#interp.memory_handle<16, ~QABORT:\00~Q string>, const_global, [], [])], []}, 0, 0>, 6 },message.T`=[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]>
+    9c4c:      	brk	#0x1
+    9c50:      	adrp	x8, 0x0 <write>
+    9c54:      	add	x8, x8, #0xba0
+    9c58:      	mov	w9, #0x2d               // =45
+    9c5c:      	stp	x8, x9, [sp, #0x100]
+    9c60:      	mov	x8, #0x2000000000000000 // =2305843009213693952
+    9c64:      	str	x8, [sp, #0x110]
+    9c68:      	adrp	x2, 0x0 <write>
+    9c6c:      	add	x2, x2, #0xb60
+    9c70:      	add	x4, sp, #0x100
+    9c74:      	mov	w0, #0xed               // =237
+    9c78:      	mov	w1, #0x12               // =18
+    9c7c:      	mov	w3, #0x31               // =49
+    9c80:      	bl	0xd0d0 <std::os::os::_abort_report[::StringSpan[ImmStaticOrigin, ::Origin[False, ImmStaticOrigin]()],::Writable & ::AnyType](::SourceLocation,$1),prefix={ #interp.memref<{[(#interp.memory_handle<16, ~QABORT:\00~Q string>, const_global, [], [])], []}, 0, 0>, 6 },message.T`=[typevalue<#kgen.instref<std::collections::string::string::String>>, struct<(pointer<none>, scalar<index>, scalar<index>) memoryOnly>]>
+    9c84:      	brk	#0x1
+    9c88:      	nop
+    9c8c:      	nop
 

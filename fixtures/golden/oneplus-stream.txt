@@ -1,0 +1,15 @@
+run: cycles 980770279 ipc 0.68 | frontend 0.1% backend 77.9% backend-mem 0.0% retiring 22.1% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+fn 100.0%  cwprobe::stream_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    80e4  31.6%    279000000    86000000         0         0  mem    ldp q24, q26, [x8, #0x60]
+    80b0  28.7%    253000000    85000000         0         0  mem    ldp q27, q26, [x8, #-0x20]
+    80a4  17.0%    150000000    41000000         0         0  mem    ldp q26, q27, [x8, #-0x80]
+    80cc  16.0%    141000000    37000000         0         0  mem    ldp q24, q25, [x8, #0x20]
+    80f0   1.5%     13000000     7000000         0         0  dep    add v4.2d, v27.2d, v4.2d
+    80d8   1.2%     11000000     1000000         0         0  dep    add v16.2d, v27.2d, v16.2d
+    8108   0.7%      6000000     5000000         0         0  dep    cmp x10, x1
+    80d4   0.6%      5000000           0         0         0  busy   ldp q26, q27, [x8]
+    80b8   0.5%      4000000           0         0         0  dep    add v23.2d, v24.2d, v23.2d
+    80c4   0.5%      4000000     4000000         0         0  dep    add v17.2d, v24.2d, v17.2d
+    8110   0.5%      4000000           0         0         0  dep    sub x9, x9, #0x20
+    80c0   0.3%      3000000     6000000         0         0  dep    add v18.2d, v25.2d, v18.2d

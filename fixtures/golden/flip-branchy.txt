@@ -1,17 +1,16 @@
-run: cycles 1321808747 ipc 0.97 | frontend 26.3% backend 4.9% backend-mem 0.0% retiring 68.8% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
-fn  13.7%  cwprobe::up
-fn   9.1%  cwprobe::down
-fn  77.3%  cwprobe::branchy_k
+run: cycles 1377417755 ipc 0.98 | frontend 26.5% backend 4.9% backend-mem 0.1% retiring 68.6% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+fn  15.0%  cwprobe::up
+fn  10.4%  cwprobe::down
+fn  74.5%  cwprobe::branchy_k
+fn   0.1%  cwprobe::fill_k
     addr   cyc%       cycles         mem        fe        br  cause  instruction
-    8238  23.8%    318000000     4000000  82000000  16000000  branch tbz w8, #0x0, 0x8220 <cwprobe::branchy_k(::Pointer[True, Mut
-    8240  13.2%    176000000     8000000  37000000   8000000  branch bl 0x81e0 <cwprobe::up(::SIMD[DType.uint64, 1])>
-    8224  12.8%    171000000     1000000  39000000   6000000  fe     bl 0x81f0 <cwprobe::down(::SIMD[DType.uint64, 1])>
-    81e0  12.5%    167000000     1000000  37000000   9000000  fe     add x8, x0, x0, lsl #1
-    8234   9.6%    128000000     2000000  30000000   9000000  branch ldrb w8, [x19], #0x8
-    81f0   9.1%    121000000     3000000  41000000   6000000  dep    eor x0, x0, x0, lsr #3
-    8228   4.5%     60000000           0  24000000   3000000  branch subs x20, x20, #0x1
-    8220   4.3%     57000000     2000000   8000000   3000000  busy   mov x0, x2
-    823c   3.7%     50000000     1000000  14000000   4000000  branch mov x0, x2
-    8244   2.9%     39000000     1000000  15000000   2000000  branch subs x20, x20, #0x1
-    81e8   1.2%     16000000     1000000   3000000         0  dep    ret
-    822c   1.1%     15000000           0   6000000         0  dep    mov x2, x0
+    8218  28.5%    375000000     6000000  79000000  17760000  branch tbz w8, #0x0, 0x8200 <cwprobe::branchy_k(::Pointer[True, `0 
+    8204  16.0%    210000000     2000000  42000000  11120000  branch bl 0x81d0 <cwprobe::down(::SIMD[DType.uint64, 1])>
+    8220  15.4%    202000000     1000000  47000000  12060000  branch bl 0x81c0 <cwprobe::up(::SIMD[DType.uint64, 1])>
+    81c0  14.4%    190000000     3000000  42000000   8810000  branch add x8, x0, x0, lsl #1
+    8210  10.5%    138000000           0         0   6090000  branch b.eq 0x8230 <cwprobe::branchy_k(::Pointer[True, `0 MutUntrac
+    81d0  10.4%    137000000     5000000  37000000   6320000  branch eor x0, x0, x0, lsr #3
+    81f8   4.0%     52000000           0         0   2760000  branch b 0x8214 <cwprobe::branchy_k(::Pointer[True, `0 MutUntracked
+    81c8   0.5%      7000000           0   4000000    670000  branch ret
+    822c   0.2%      3000000           0         0    220000  branch b.ne 0x8214 <cwprobe::branchy_k(::Pointer[True, `0 MutUntrac
+    82a0   0.1%      1000000           0         0         0  dep    eor x8, x8, x8, lsl #13

@@ -1,0 +1,14 @@
+run: cycles 870296953 ipc 0.73 | frontend 28.7% backend 17.0% backend-mem 0.0% retiring 54.4% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+fn   8.4%  cwprobe::up
+fn   8.4%  cwprobe::down
+fn  83.1%  cwprobe::branchy_k
+fn   0.1%  cwprobe::fill_k
+    addr   cyc%       cycles         mem        fe        br  cause  instruction
+    8200  40.5%    337000000    15000000  37000000   3600000  mem    ldrb w8, [x20], #0x8
+    81f0  12.9%    107000000     1000000  17000000   3240000  branch bl 0x81c0 <cwprobe::down(::SIMD[DType.uint64, 1])>
+    81e8  10.7%     89000000           0         0   2870000  branch b 0x8200 <cwprobe::branchy_k(::Pointer[True, MutUntrackedOri
+    8204  10.2%     85000000           0  63000000  10030000  branch tbz w8, #0x0, 0x81ec <cwprobe::branchy_k(::Pointer[True, Mut
+    820c   8.8%     73000000     4000000  25000000   2990000  branch bl 0x81b0 <cwprobe::up(::SIMD[DType.uint64, 1])>
+    81b0   8.4%     70000000     3000000  16000000   2210000  branch add x8, x0, x0, lsl #1
+    81c0   8.4%     70000000     1000000  24000000   2110000  branch eor x0, x0, x0, lsr #3
+    8290   0.1%      1000000           0         0         0  dep    eor x8, x8, x8, lsl #17

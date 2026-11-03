@@ -1,0 +1,8 @@
+run: cycles 980770279 ipc 0.68 | frontend 0.1% backend 77.9% backend-mem 0.0% retiring 22.1% (ARM STALL_FRONTEND, STALL_BACKEND, STALL_BACKEND_MEM over cycles; retiring = the rest)
+cause           cycles   share
+mem          823000000   93.3%
+fe                   0    0.0%
+dep           52000000    5.9%
+branch               0    0.0%
+busy           7000000    0.8%
+total        882000000  raw 882000000

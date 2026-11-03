@@ -17,7 +17,7 @@ live() {
         ./corewait record "$dev" "$out" -- build/cwprobe-"$dev" "$p"
         ./corewait show "$out" --fn "${p}_k" --causes | tee "$out/causes.txt"
         got=$(gawk '$1 ~ /^(mem|fe|dep|branch|busy)$/ && $2 + 0 > best { best = $2 + 0; got = $1 } END { print got }' "$out/causes.txt")
-        if [ "$p" = branchy ] && ! grep -q '^p_br	' "$out/stat.tsv" && [ "$got" = busy ]; then
+        if [ "$p" = branchy ] && ! grep -q '^br	' "$out/samples.tsv" && [ "$got" = busy ]; then
             echo "note: $dev has no mispredict event, busy accepted for branchy"; got=branch
         fi
         [ "$got" = "${want[$p]}" ] || fail "$p" "top cause of ${p}_k is $got, want ${want[$p]} ($out/causes.txt)"
@@ -32,6 +32,8 @@ live() {
 }
 
 mkdir -p .work
-./corewait attached "$dev" || { echo "PENDING $dev: not attached, nothing checked"; exit 0; }
+rc=0; ./corewait attached "$dev" || rc=$?
+[ "$rc" = 3 ] && { echo "PENDING $dev: not attached, nothing checked"; exit 0; }
+[ "$rc" = 0 ] || { echo "FAIL attached: $dev is not configured (exit $rc)"; exit 1; }
 live "$@" 2>&1 | tee ".work/live-$dev.txt"
 exit "${PIPESTATUS[0]}"

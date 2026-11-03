@@ -10,7 +10,7 @@ fn  17.8%  cwprobe::fill_k
     1395   4.3%     49000000     3420000   4000000         0  mem    vpaddq ymm0, ymm0, ymmword ptr [rdi + 8*rax + 0x20]
     13a1   4.2%     48000000     4560000         0         0  mem    vpaddq ymm6, ymm6, ymmword ptr [rdi + 8*rax + 0x60]
     1534   3.6%     41000000           0         0         0  dep    mov rcx, r8
-    1527   3.0%     34000000           0         0         0  busy   xor rdx, rcx
+    1527   3.0%     34000000           0         0         0  dep    xor rdx, rcx
     13b0   2.6%     30000000     3440000   4000000         0  mem    vpaddq ymm3, ymm3, ymmword ptr [rdi + 8*rax + 0xa0]
     153e   2.3%     26000000           0         0         0  dep    mov qword ptr [rdi + 8*rax], rcx
     153b   1.9%     22000000           0         0         0  dep    xor rcx, r8
