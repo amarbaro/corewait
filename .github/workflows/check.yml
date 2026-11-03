@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v7
       - run: sudo apt-get update -q && sudo apt-get install -yq llvm gawk time
@@ -22,6 +22,7 @@ jobs:
         shell: bash
       - name: Badge
         if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true   # a failed badge write must not turn CI red
         shell: bash
         run: |
           s=$(grep -oE "^(PASS|FAIL) [0-9]+/[0-9]+" ci.log | tail -1 || true)
