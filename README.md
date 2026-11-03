@@ -1,5 +1,9 @@
 # corewait
 
+<!-- badges -->
+[![check](https://github.com/amarbaro/corewait/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/amarbaro/corewait/actions/workflows/check.yml) [![latest release](https://img.shields.io/github/v/release/amarbaro/corewait)](https://github.com/amarbaro/corewait/releases/latest) [![license](https://img.shields.io/github/license/amarbaro/corewait)](https://github.com/amarbaro/corewait/blob/main/LICENSE) [![checks](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/amarbaro/corewait/badges/checks.json)](https://github.com/amarbaro/corewait/actions/workflows/check.yml)
+<!-- /badges -->
+
 Per-instruction CPU stall profiler for desktop, laptop and phones: hardware-counter samples joined to the disassembly,
 with a cause on every row. Devices and counters: `docs/DEVICES.md`.
 

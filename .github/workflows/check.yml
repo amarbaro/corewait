@@ -3,6 +3,9 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+permissions:
+  contents: write
+
 jobs:
   check:
     runs-on: ubuntu-24.04
@@ -15,4 +18,16 @@ jobs:
       - uses: prefix-dev/setup-pixi@v0.10.2
         with:
           pixi-version: v0.81.0
-      - run: pixi run check   # CPU only, committed fixtures; CW_NO_RECORD skips the perf record on this machine
+      - run: pixi run check 2>&1 | tee ci.log
+        shell: bash
+      - name: Badge
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          s=$(grep -oE "^(PASS|FAIL) [0-9]+/[0-9]+" ci.log | tail -1 || true)
+          if [[ $s =~ ^(PASS|FAIL)\ ([0-9]+)/([0-9]+) ]]; then m=${BASH_REMATCH[3]}; [[ ${BASH_REMATCH[1]} == PASS ]] && p=${BASH_REMATCH[2]} || p=$((m - BASH_REMATCH[2]))
+          else p=$(grep -cE "^ok " ci.log || true); m=$((p + $(grep -cE "^(FAIL|not ok)" ci.log || true))); fi
+          c=red; ((m > 0 && p == m)) && c=brightgreen
+          mkdir -p .b && printf '{"schemaVersion":1,"label":"checks","message":"%s/%s","color":"%s"}\n' $p $m $c > .b/checks.json
+          cd .b && git init -q -b badges && git add checks.json && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "checks $p/$m"
+          git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" badges
